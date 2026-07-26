@@ -1,11 +1,15 @@
-// stores/useOverlayStore.ts
 import { create } from 'zustand';
 
 export type OverlayType =
-  | 'addTask' | 'editTask' | 'deleteTask'
-  | 'addHabit' | 'editHabit'
+  | 'addTask'
+  | 'editTask'
+  | 'deleteTask'
+  | 'addHabit'
+  | 'editHabit'
   | 'addJournal'
-  | 'dayDetails' | 'analyticsBreakdown' | 'goalDetails'
+  | 'dayDetails'
+  | 'analyticsBreakdown'
+  | 'goalDetails'
   | 'profileSettings'
   | null;
 

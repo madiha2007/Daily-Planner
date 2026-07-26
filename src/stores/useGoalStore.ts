@@ -1,0 +1,44 @@
+import { create } from 'zustand';
+import { Goal } from '@/lib/types';
+import { fetchGoals, createGoal, updateGoal, deleteGoal } from '@/lib/api/goals';
+
+interface GoalState {
+  goals: Goal[];
+  loading: boolean;
+  error: string | null;
+  fetchAll: () => Promise<void>;
+  addGoal: (input: Omit<Goal, 'id' | 'createdAt'>) => Promise<void>;
+  editGoal: (id: string, updates: Partial<Goal>) => Promise<void>;
+  removeGoal: (id: string) => Promise<void>;
+}
+
+export const useGoalStore = create<GoalState>((set, get) => ({
+  goals: [],
+  loading: false,
+  error: null,
+
+  fetchAll: async () => {
+    set({ loading: true, error: null });
+    try {
+      const goals = await fetchGoals();
+      set({ goals, loading: false });
+    } catch (err) {
+      set({ error: (err as Error).message, loading: false });
+    }
+  },
+
+  addGoal: async (input) => {
+    const goal = await createGoal(input);
+    set({ goals: [...get().goals, goal] });
+  },
+
+  editGoal: async (id, updates) => {
+    const updated = await updateGoal(id, updates);
+    set({ goals: get().goals.map((g) => (g.id === id ? updated : g)) });
+  },
+
+  removeGoal: async (id) => {
+    set({ goals: get().goals.filter((g) => g.id !== id) });
+    await deleteGoal(id);
+  },
+}));
