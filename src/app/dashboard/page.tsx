@@ -11,9 +11,7 @@ import JournalSection from '@/components/sections/JournalSection';
 
 export default function DashboardPage() {
   return (
-    <DashboardShell>
-      <OverviewSection />
-
+    <DashboardShell headerRight={<OverviewSection />}>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <TasksSection />

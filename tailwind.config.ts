@@ -31,6 +31,7 @@ const config: Config = {
         card: '0 4px 20px rgba(0,0,0,0.06)',
       },
       fontFamily: {
+         sans: ['"Intel One Mono"', 'Inter', 'system-ui', 'sans-serif'],
         jacquarda: ['"Jacquarda Bastarda 9"', 'serif'],
       },
     },

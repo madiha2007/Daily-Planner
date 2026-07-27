@@ -22,7 +22,7 @@ export default function TopBar() {
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <div className="relative hidden sm:block">
           <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
@@ -39,7 +39,7 @@ export default function TopBar() {
           <Bell size={16} />
           <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
         </button>
-      </div>
+      </div> */}
     </header>
   );
 }
