@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { CheckSquare, Repeat, Flame, Target } from 'lucide-react';
-import ProgressCard from '@/components/data/ProgressCard';
+import Skeleton from '@/components/ui/Skeleton';
 import { useTaskStore } from '@/stores/useTaskStore';
 import { useHabitStore } from '@/stores/useHabitStore';
-import { useGoalStore } from '@/stores/useGoalStore';
 import { useActivityStore } from '@/stores/useActivityStore';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 import { formatDateISO } from '@/lib/utils';
@@ -13,23 +11,23 @@ import { formatDateISO } from '@/lib/utils';
 export default function OverviewSection() {
   const { tasks, loading: tasksLoading, fetchAll: fetchTasks } = useTaskStore();
   const { habits, loading: habitsLoading, fetchAll: fetchHabits } = useHabitStore();
-  const { goals, loading: goalsLoading, fetchAll: fetchGoals } = useGoalStore();
   const { days, loading: activityLoading, fetchAll: fetchActivity } = useActivityStore();
   const scrollTo = useScrollToSection();
 
   useEffect(() => {
     fetchTasks();
     fetchHabits();
-    fetchGoals();
     fetchActivity();
-  }, [fetchTasks, fetchHabits, fetchGoals, fetchActivity]);
+  }, [fetchTasks, fetchHabits, fetchActivity]);
+
+  const loading = tasksLoading || habitsLoading || activityLoading;
 
   const doneTasks = tasks.filter((t) => t.done).length;
+  const progressPct = tasks.length ? Math.round((doneTasks / tasks.length) * 100) : 0;
+
   const today = formatDateISO(new Date());
   const habitsDoneToday = habits.filter((h) => h.completions.includes(today)).length;
-  const avgGoalProgress = goals.length
-    ? Math.round(goals.reduce((sum, g) => sum + g.progress, 0) / goals.length)
-    : 0;
+
   const currentStreak = (() => {
     let streak = 0;
     for (let i = days.length - 1; i >= 0; i--) {
@@ -39,42 +37,41 @@ export default function OverviewSection() {
     return streak;
   })();
 
+  // Productivity score: simple composite out of 10, derived from real data (never hardcoded).
+  const productivityScore = (() => {
+    if (tasks.length === 0 && habits.length === 0) return '0/10';
+    const taskScore = tasks.length ? doneTasks / tasks.length : 0;
+    const habitScore = habits.length ? habitsDoneToday / habits.length : 0;
+    const score = Math.round(((taskScore + habitScore) / 2) * 10);
+    return `${score}/10`;
+  })();
+
+  const stats = [
+    { label: "Today's Streak", value: String(currentStreak).padStart(2, '0'), target: 'heatmap' },
+    { label: 'Progress Percentage', value: `${progressPct}%`, target: 'tasks' },
+    { label: 'Productivity Score', value: productivityScore, target: 'analytics' },
+  ];
+
   return (
     <section id="overview" className="scroll-mt-20 rounded-2xl">
-      <h2 className="mb-4 text-lg font-semibold text-neutral-900">Overview</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <ProgressCard
-          icon={CheckSquare}
-          label="Tasks completed"
-          value={`${doneTasks}/${tasks.length}`}
-          tone="emerald"
-          loading={tasksLoading}
-          onClick={() => scrollTo('tasks')}
-        />
-        <ProgressCard
-          icon={Repeat}
-          label="Habits today"
-          value={`${habitsDoneToday}/${habits.length}`}
-          tone="blue"
-          loading={habitsLoading}
-          onClick={() => scrollTo('habits')}
-        />
-        <ProgressCard
-          icon={Flame}
-          label="Current streak"
-          value={`${currentStreak} days`}
-          tone="amber"
-          loading={activityLoading}
-          onClick={() => scrollTo('heatmap')}
-        />
-        <ProgressCard
-          icon={Target}
-          label="Goal progress"
-          value={`${avgGoalProgress}%`}
-          tone="purple"
-          loading={goalsLoading}
-          onClick={() => scrollTo('goals')}
-        />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {loading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-neutral-200 bg-white p-5">
+                <Skeleton className="h-8 w-16 mx-auto mb-2" />
+                <Skeleton className="h-3 w-24 mx-auto" />
+              </div>
+            ))
+          : stats.map((stat) => (
+              <button
+                key={stat.label}
+                onClick={() => scrollTo(stat.target)}
+                className="rounded-2xl border border-neutral-200 bg-white p-5 text-center transition-shadow hover:shadow-card"
+              >
+                <p className="font-mono text-2xl font-semibold tracking-tight text-neutral-900">{stat.value}</p>
+                <p className="mt-1 text-xs text-neutral-400">{stat.label}</p>
+              </button>
+            ))}
       </div>
     </section>
   );

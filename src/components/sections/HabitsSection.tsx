@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Plus, Repeat } from 'lucide-react';
-import Card from '@/components/ui/Card';
+import { Plus, Repeat, Target } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { CardSkeleton } from '@/components/ui/Skeleton';
+import Skeleton from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import HabitItem from '@/components/data/HabitItem';
 import { useHabitStore } from '@/stores/useHabitStore';
@@ -19,39 +18,46 @@ export default function HabitsSection() {
   }, [fetchAll]);
 
   return (
-    <section id="habits" className="scroll-mt-20 rounded-2xl">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-neutral-900">Habits</h2>
-        <Button size="sm" onClick={() => open('addHabit')}>
-          <Plus size={15} /> Add Habit
-        </Button>
-      </div>
-
-      {loading ? (
-        <div className="flex flex-col gap-3">
-          <CardSkeleton />
-          <CardSkeleton />
+    <section id="habits" className="scroll-mt-20 rounded-2xl h-full">
+      <div className="flex h-full flex-col rounded-2xl border border-blue-200 bg-blue-50 p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Target size={16} className="text-blue-600" />
+            <h2 className="text-sm font-semibold text-neutral-800">Habit Tracker</h2>
+          </div>
+          <button
+            onClick={() => open('addHabit')}
+            aria-label="Add habit"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+          >
+            <Plus size={15} />
+          </button>
         </div>
-      ) : habits.length === 0 ? (
-        <Card>
+
+        {loading ? (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+          </div>
+        ) : habits.length === 0 ? (
           <EmptyState
             icon={Repeat}
             title="No habits yet"
-            message="Start tracking a habit to build momentum."
+            message="Start tracking a habit."
             action={
               <Button size="sm" onClick={() => open('addHabit')}>
                 <Plus size={15} /> Add Habit
               </Button>
             }
           />
-        </Card>
-      ) : (
-        <Card className="p-2">
-          {habits.map((habit) => (
-            <HabitItem key={habit.id} habit={habit} />
-          ))}
-        </Card>
-      )}
+        ) : (
+          <div className="flex flex-1 flex-col gap-0.5">
+            {habits.map((habit) => (
+              <HabitItem key={habit.id} habit={habit} />
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

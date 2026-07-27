@@ -45,36 +45,36 @@ export default function CalendarSection() {
     <section id="calendar" className="scroll-mt-20 rounded-2xl">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-neutral-900">Calendar</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 rounded-full bg-blue-600 px-1 py-1 text-white">
           <button
             onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
             aria-label="Previous month"
-            className="rounded-lg p-1.5 hover:bg-neutral-100 text-neutral-500"
+            className="rounded-full p-1 hover:bg-blue-700"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={14} />
           </button>
-          <span className="text-sm font-medium text-neutral-700 w-32 text-center">
-            {format(currentMonth, 'MMMM yyyy')}
+          <span className="text-xs font-medium px-1 w-20 text-center">
+            {format(currentMonth, 'MMM yyyy')}
           </span>
           <button
             onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
             aria-label="Next month"
-            className="rounded-lg p-1.5 hover:bg-neutral-100 text-neutral-500"
+            className="rounded-full p-1 hover:bg-blue-700"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={14} />
           </button>
         </div>
       </div>
 
-      <Card>
-        <div className="grid grid-cols-7 gap-1 mb-2">
+      <Card className="p-4">
+        <div className="grid grid-cols-7 gap-0.5 mb-1">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="text-center text-xs font-medium text-neutral-400 py-1">
-              {d}
+            <div key={d} className="text-center text-[10px] font-medium text-neutral-400 py-1">
+              {d[0]}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-0.5">
           {days.map((date) => (
             <CalendarDay
               key={date.toISOString()}

@@ -29,7 +29,7 @@ export default function TaskItem({ task }: { task: Task }) {
         aria-label={task.done ? 'Mark task incomplete' : 'Mark task complete'}
         className={cn(
           'h-5 w-5 shrink-0 rounded-md border-2 flex items-center justify-center transition-colors',
-          task.done ? 'border-emerald-500 bg-emerald-500' : 'border-neutral-300'
+          task.done ? 'border-blue-600 bg-blue-600' : 'border-neutral-300'
         )}
       >
         {task.done && <div className="h-2 w-2 rounded-sm bg-white" />}

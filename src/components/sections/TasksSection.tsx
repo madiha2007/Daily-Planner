@@ -22,9 +22,13 @@ export default function TasksSection() {
     <section id="tasks" className="scroll-mt-20 rounded-2xl">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-neutral-900">Today&apos;s Tasks</h2>
-        <Button size="sm" onClick={() => open('addTask')}>
-          <Plus size={15} /> Add Task
-        </Button>
+        <button
+          onClick={() => open('addTask')}
+          aria-label="Add task"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+        >
+          <Plus size={16} />
+        </button>
       </div>
 
       {loading ? (

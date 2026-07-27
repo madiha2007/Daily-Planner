@@ -13,10 +13,25 @@ export default function DashboardPage() {
   return (
     <DashboardShell>
       <OverviewSection />
-      <TasksSection />
-      <CalendarSection />
-      <HabitsSection />
-      <HeatmapSection />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TasksSection />
+        </div>
+        <div>
+          <CalendarSection />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <HeatmapSection />
+        </div>
+        <div>
+          <HabitsSection />
+        </div>
+      </div>
+
       <AnalyticsSection />
       <GoalsSection />
       <JournalSection />
