@@ -33,7 +33,7 @@ function SidebarTooltip({ label }: { label: string }) {
   return (
     <span
       role="tooltip"
-      className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 whitespace-nowrap rounded-lg bg-neutral-900 px-2.5 py-1.5
+      className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 whitespace-nowrap rounded-lg bg-blue-600 px-2.5 py-1.5
                  text-xs font-medium text-white opacity-0 shadow-lg
                  transition-all duration-150 -translate-x-1
                  group-hover:opacity-100 group-hover:translate-x-0"
