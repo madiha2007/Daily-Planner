@@ -3,16 +3,15 @@ import { cn } from '@/lib/utils';
 
 interface BadgeProps {
   children: ReactNode;
-  tone?: 'neutral' | 'emerald' | 'amber' | 'red' | 'blue' | 'purple';
+  tone?: 'neutral' | 'peach' | 'blush' | 'cream' | 'red';
 }
 
 const toneStyles: Record<NonNullable<BadgeProps['tone']>, string> = {
-  neutral: 'bg-neutral-100 text-neutral-600',
-  emerald: 'bg-emerald-100 text-emerald-700',
-  amber: 'bg-amber-100 text-amber-700',
-  red: 'bg-red-100 text-red-700',
-  blue: 'bg-blue-100 text-blue-700',
-  purple: 'bg-purple-100 text-purple-700',
+  neutral: 'bg-cream-200 text-cocoa-600',
+  peach: 'bg-peach-200 text-peach-700',
+  blush: 'bg-blush-200 text-blush-400',
+  cream: 'bg-cream-300 text-cocoa-700',
+  red: 'bg-red-100 text-red-500',
 };
 
 export default function Badge({ children, tone = 'neutral' }: BadgeProps) {
