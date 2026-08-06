@@ -11,7 +11,7 @@ interface AnalyticsCardProps {
   color?: string;
 }
 
-export default function AnalyticsCard({ title, value, trendData, color = '#2563eb' }: AnalyticsCardProps) {
+export default function AnalyticsCard({ title, value, trendData, color = '#f5804a' }: AnalyticsCardProps) {
   const open = useOverlayStore((s) => s.open);
 
   return (
@@ -23,8 +23,8 @@ export default function AnalyticsCard({ title, value, trendData, color = '#2563e
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-xs text-neutral-500">{title}</p>
-      <p className="text-sm font-semibold text-neutral-900">{value}</p>
+      <p className="text-xs text-cocoa-400">{title}</p>
+      <p className="text-sm font-semibold text-cocoa-800">{value}</p>
     </Card>
   );
 }

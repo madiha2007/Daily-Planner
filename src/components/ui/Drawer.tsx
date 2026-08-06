@@ -20,7 +20,7 @@ export default function Drawer({ title, children, widthClass = 'w-full sm:w-[440
       <Dialog.Portal forceMount>
         <Dialog.Overlay asChild>
           <motion.div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-cocoa-800/30 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -29,18 +29,18 @@ export default function Drawer({ title, children, widthClass = 'w-full sm:w-[440
         </Dialog.Overlay>
         <Dialog.Content asChild>
           <motion.div
-            className={`fixed right-0 top-0 z-50 h-full ${widthClass} overflow-y-auto bg-white p-6 shadow-2xl focus:outline-none`}
+            className={`fixed right-0 top-0 z-50 h-full ${widthClass} overflow-y-auto bg-cream-100 border-l border-peach-200 p-6 shadow-warm focus:outline-none`}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
             <div className="mb-5 flex items-center justify-between">
-              <Dialog.Title className="text-lg font-semibold text-neutral-900">{title}</Dialog.Title>
+              <Dialog.Title className="text-xl font-semibold text-cocoa-800">{title}</Dialog.Title>
               <Dialog.Close asChild>
                 <button
                   aria-label="Close"
-                  className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                  className="rounded-full p-1.5 text-cocoa-400 hover:bg-peach-100 hover:text-cocoa-600"
                 >
                   <X size={18} />
                 </button>

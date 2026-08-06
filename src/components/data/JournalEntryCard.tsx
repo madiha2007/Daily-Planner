@@ -15,11 +15,11 @@ const moodEmoji: Record<JournalEntry['mood'], string> = {
   rough: '😣',
 };
 
-const moodTone: Record<JournalEntry['mood'], 'emerald' | 'blue' | 'neutral' | 'amber' | 'red'> = {
-  great: 'emerald',
-  good: 'blue',
+const moodTone: Record<JournalEntry['mood'], 'peach' | 'cream' | 'neutral' | 'blush' | 'red'> = {
+  great: 'peach',
+  good: 'cream',
   okay: 'neutral',
-  low: 'amber',
+  low: 'blush',
   rough: 'red',
 };
 
@@ -32,13 +32,13 @@ export default function JournalEntryCard({ entry }: { entry: JournalEntry }) {
         <Badge tone={moodTone[entry.mood]}>
           {moodEmoji[entry.mood]} {entry.mood}
         </Badge>
-        <span className="text-xs text-neutral-400">{format(parseISO(entry.createdAt), 'MMM d')}</span>
+        <span className="text-xs text-cocoa-400">{format(parseISO(entry.createdAt), 'MMM d')}</span>
       </div>
-      <p className="text-sm text-neutral-700 line-clamp-3">{entry.content}</p>
+      <p className="text-sm text-cocoa-700 line-clamp-3">{entry.content}</p>
       <button
         onClick={() => removeEntry(entry.id)}
         aria-label="Delete journal entry"
-        className="absolute right-3 bottom-3 rounded-lg p-1.5 text-neutral-300 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 transition-opacity"
+        className="absolute right-3 bottom-3 rounded-lg p-1.5 text-cocoa-300 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-400 transition-opacity"
       >
         <Trash2 size={14} />
       </button>

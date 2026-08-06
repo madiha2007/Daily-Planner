@@ -18,21 +18,21 @@ export default function HabitItem({ habit }: { habit: Habit }) {
   }).length;
 
   return (
-    <div className="group flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/50 transition-colors">
+    <div className="group flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/60 transition-colors">
       <button
         onClick={() => toggleToday(habit.id)}
         aria-label={doneToday ? 'Mark habit not done today' : 'Mark habit done today'}
         className={cn(
           'h-5 w-5 shrink-0 rounded-md border-2 flex items-center justify-center transition-colors',
-          doneToday ? 'border-blue-600 bg-blue-600' : 'border-blue-300 bg-white'
+          doneToday ? 'border-peach-400 bg-peach-400' : 'border-peach-300 bg-white'
         )}
       >
         {doneToday && <div className="h-2 w-2 rounded-sm bg-white" />}
       </button>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-neutral-800 truncate">{habit.title}</p>
-        <p className="text-xs text-blue-700/60">
+        <p className="text-sm font-medium text-cocoa-800 truncate">{habit.title}</p>
+        <p className="text-xs text-peach-700/70">
           {weekCount}/{habit.targetPerWeek} this week
         </p>
       </div>
@@ -40,7 +40,7 @@ export default function HabitItem({ habit }: { habit: Habit }) {
       <button
         onClick={() => open('editHabit', { habit })}
         aria-label="Edit habit"
-        className="rounded-lg p-1.5 text-blue-400 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-blue-600 transition-opacity"
+        className="rounded-lg p-1.5 text-peach-400 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-peach-600 transition-opacity"
       >
         <Pencil size={14} />
       </button>

@@ -8,11 +8,11 @@ import HeatmapCell from '@/components/data/HeatmapCell';
 import { useActivityStore } from '@/stores/useActivityStore';
 
 const intensityLegend = [
-  { level: 0, className: 'bg-neutral-100' },
-  { level: 1, className: 'bg-emerald-100' },
-  { level: 2, className: 'bg-emerald-300' },
-  { level: 3, className: 'bg-emerald-500' },
-  { level: 4, className: 'bg-emerald-700' },
+  { level: 0, className: 'bg-peach-50' },
+  { level: 1, className: 'bg-peach-200' },
+  { level: 2, className: 'bg-peach-300' },
+  { level: 3, className: 'bg-peach-400' },
+  { level: 4, className: 'bg-peach-600' },
 ];
 
 export default function HeatmapSection() {

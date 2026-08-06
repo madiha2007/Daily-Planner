@@ -25,7 +25,7 @@ export default function TasksSection() {
         <button
           onClick={() => open('addTask')}
           aria-label="Add task"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-peach-300 text-white hover:bg-peach-600"
         >
           <Plus size={16} />
         </button>

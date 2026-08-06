@@ -11,7 +11,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={id} className="text-sm font-medium text-neutral-700">
+          <label htmlFor={id} className="text-sm font-medium text-cocoa-700">
             {label}
           </label>
         )}
@@ -19,14 +19,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={id}
           className={cn(
-            'rounded-xl border border-neutral-200 px-3 py-2.5 text-sm text-neutral-900',
-            'focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent',
-            error && 'border-red-400 focus:ring-red-400',
+            'rounded-xl border border-peach-200 bg-white px-3 py-2.5 text-sm text-cocoa-800 placeholder:text-cocoa-300',
+            'focus:outline-none focus:ring-2 focus:ring-peach-300 focus:border-transparent',
+            error && 'border-red-300 focus:ring-red-300',
             className
           )}
           {...props}
         />
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        {error && <span className="text-xs text-red-400">{error}</span>}
       </div>
     );
   }
@@ -43,7 +43,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={id} className="text-sm font-medium text-neutral-700">
+          <label htmlFor={id} className="text-sm font-medium text-cocoa-700">
             {label}
           </label>
         )}
@@ -51,14 +51,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={id}
           className={cn(
-            'rounded-xl border border-neutral-200 px-3 py-2.5 text-sm text-neutral-900 resize-none',
-            'focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent',
-            error && 'border-red-400 focus:ring-red-400',
+            'rounded-xl border border-peach-200 bg-white px-3 py-2.5 text-sm text-cocoa-800 placeholder:text-cocoa-300 resize-none',
+            'focus:outline-none focus:ring-2 focus:ring-peach-300 focus:border-transparent',
+            error && 'border-red-300 focus:ring-red-300',
             className
           )}
           {...props}
         />
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        {error && <span className="text-xs text-red-400">{error}</span>}
       </div>
     );
   }

@@ -55,7 +55,7 @@ export default function OverviewSection() {
     <div id="overview" className="scroll-mt-20 flex gap-3">
       {loading
         ? Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-neutral-200 bg-white px-5 py-3 w-32">
+            <div key={i} className="rounded-2xl border border-peach-200 bg-white px-5 py-3 w-32 shadow-soft">
               <Skeleton className="h-6 w-12 mx-auto mb-2" />
               <Skeleton className="h-2 w-16 mx-auto" />
             </div>
@@ -64,10 +64,10 @@ export default function OverviewSection() {
             <button
               key={stat.label}
               onClick={() => scrollTo(stat.target)}
-              className="rounded-2xl border border-neutral-200 bg-white px-5 py-3 text-center transition-shadow hover:shadow-card w-32 shrink-0"
+              className="rounded-2xl border border-peach-200 bg-white px-5 py-3 text-center shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-card w-32 shrink-0"
             >
-              <p className="font-mono text-xl font-semibold tracking-tight text-neutral-900">{stat.value}</p>
-              <p className="mt-1 text-[11px] leading-tight text-neutral-400">{stat.label}</p>
+              <p className="text-xl font-bold tracking-tight text-cocoa-800">{stat.value}</p>
+              <p className="mt-1 text-[11px] leading-tight text-cocoa-400">{stat.label}</p>
             </button>
           ))}
     </div>

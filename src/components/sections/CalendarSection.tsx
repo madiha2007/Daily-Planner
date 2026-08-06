@@ -44,12 +44,12 @@ export default function CalendarSection() {
   return (
     <section id="calendar" className="scroll-mt-20 rounded-2xl">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-neutral-900">Calendar</h2>
-        <div className="flex items-center gap-1 rounded-full bg-blue-600 px-1 py-1 text-white">
+        <h2 className="text-lg font-semibold text-cocoa-800">Calendar</h2>
+        <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-peach-400 to-blush-400 px-1 py-1 text-white shadow-warm">
           <button
             onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
             aria-label="Previous month"
-            className="rounded-full p-1 hover:bg-blue-700"
+            className="rounded-full p-1 hover:bg-white/20"
           >
             <ChevronLeft size={14} />
           </button>
@@ -59,7 +59,7 @@ export default function CalendarSection() {
           <button
             onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
             aria-label="Next month"
-            className="rounded-full p-1 hover:bg-blue-700"
+            className="rounded-full p-1 hover:bg-white/20"
           >
             <ChevronRight size={14} />
           </button>
@@ -69,7 +69,7 @@ export default function CalendarSection() {
       <Card className="p-4">
         <div className="grid grid-cols-7 gap-0.5 mb-1">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="text-center text-[10px] font-medium text-neutral-400 py-1">
+            <div key={d} className="text-center text-[10px] font-medium text-cocoa-400 py-1">
               {d[0]}
             </div>
           ))}

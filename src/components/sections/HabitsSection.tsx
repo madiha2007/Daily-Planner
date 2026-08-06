@@ -19,16 +19,16 @@ export default function HabitsSection() {
 
   return (
     <section id="habits" className="scroll-mt-20 rounded-2xl h-full">
-      <div className="flex h-full flex-col rounded-2xl border border-blue-200 bg-blue-50 p-4">
+      <div className="flex h-full flex-col rounded-3xl border border-peach-300 bg-gradient-to-br from-peach-100 to-blush-100 p-4 shadow-soft">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target size={16} className="text-blue-600" />
-            <h2 className="text-sm font-semibold text-neutral-800">Habit Tracker</h2>
+            <Target size={16} className="text-peach-600" />
+            <h2 className="text-sm font-semibold text-cocoa-800">Habit Tracker</h2>
           </div>
           <button
             onClick={() => open('addHabit')}
             aria-label="Add habit"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-peach-400 to-blush-400 text-white shadow-warm hover:brightness-105"
           >
             <Plus size={15} />
           </button>

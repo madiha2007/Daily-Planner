@@ -1,5 +1,5 @@
 interface ProgressRingProps {
-  progress: number; // 0-100
+  progress: number;
   size?: number;
   strokeWidth?: number;
 }
@@ -18,7 +18,7 @@ export default function ProgressRing({ progress, size = 56, strokeWidth = 5 }: P
         fill="none"
         stroke="currentColor"
         strokeWidth={strokeWidth}
-        className="text-neutral-100"
+        className="text-peach-100"
       />
       <circle
         cx={size / 2}
@@ -30,14 +30,14 @@ export default function ProgressRing({ progress, size = 56, strokeWidth = 5 }: P
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         strokeLinecap="round"
-        className="text-emerald-500 transition-all duration-500"
+        className="text-peach-400 transition-all duration-500"
       />
       <text
         x="50%"
         y="50%"
         textAnchor="middle"
         dominantBaseline="middle"
-        className="rotate-90 fill-neutral-700 text-[11px] font-semibold"
+        className="rotate-90 fill-cocoa-700 text-[11px] font-semibold"
         style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
       >
         {progress}%

@@ -33,13 +33,13 @@ export default function AnalyticsSection() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <AnalyticsCard title="Tasks completed (14d)" value={String(totalTasks)} trendData={tasksTrend} color="#10b981" />
-          <AnalyticsCard title="Habits completed (14d)" value={String(totalHabits)} trendData={habitsTrend} color="#3b82f6" />
+          <AnalyticsCard title="Tasks completed (14d)" value={String(totalTasks)} trendData={tasksTrend} color="#f5804a" />
+          <AnalyticsCard title="Habits completed (14d)" value={String(totalHabits)} trendData={habitsTrend} color="#e5808f" />
           <AnalyticsCard
             title="Avg. daily intensity"
             value={`${avgIntensity}/4`}
             trendData={recent.map((d) => ({ value: d.intensity }))}
-            color="#a855f7"
+            color="#a6795f"
           />
         </div>
       )}

@@ -21,13 +21,13 @@ export default function CalendarDay({ date, currentMonth, taskCount }: CalendarD
       onClick={() => open('dayDetails', { date: iso })}
       className={cn(
         'aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 text-sm transition-colors',
-        inMonth ? 'text-neutral-700 hover:bg-neutral-100' : 'text-neutral-300 hover:bg-neutral-50',
-        today && 'bg-blue-600 text-white hover:bg-blue-700'
+        inMonth ? 'text-cocoa-700 hover:bg-peach-100' : 'text-cocoa-200 hover:bg-peach-50',
+        today && 'bg-gradient-to-br from-peach-400 to-blush-400 text-white hover:brightness-105'
       )}
     >
       <span>{format(date, 'd')}</span>
       {taskCount > 0 && (
-        <span className={cn('h-1 w-1 rounded-full', today ? 'bg-white' : 'bg-blue-500')} />
+        <span className={cn('h-1 w-1 rounded-full', today ? 'bg-white' : 'bg-peach-400')} />
       )}
     </button>
   );
