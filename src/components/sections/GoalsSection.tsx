@@ -8,9 +8,11 @@ import Skeleton from '@/components/ui/Skeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import GoalCard from '@/components/data/GoalCard';
 import { useGoalStore } from '@/stores/useGoalStore';
+import { useOverlayStore } from '@/stores/useOverlayStore';
 
 export default function GoalsSection() {
   const { goals, loading, fetchAll } = useGoalStore();
+  const open = useOverlayStore((s) => s.open);
 
   useEffect(() => {
     fetchAll();
@@ -19,9 +21,8 @@ export default function GoalsSection() {
   return (
     <section id="goals" className="scroll-mt-20 rounded-2xl">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-neutral-900">Goals</h2>
-        {/* Add-goal overlay can reuse the AddHabit pattern; wire up an AddGoalModal the same way when ready */}
-        <Button size="sm" variant="secondary" disabled>
+        <h2 className="text-lg font-semibold text-cocoa-800">Goals</h2>
+        <Button size="sm" onClick={() => open('addGoal')}>
           <Plus size={15} /> Add Goal
         </Button>
       </div>
@@ -33,7 +34,16 @@ export default function GoalsSection() {
         </div>
       ) : goals.length === 0 ? (
         <Card>
-          <EmptyState icon={Target} title="No goals yet" message="Set a goal to track your bigger milestones." />
+          <EmptyState
+            icon={Target}
+            title="No goals yet"
+            message="Set a goal to track your bigger milestones."
+            action={
+              <Button size="sm" onClick={() => open('addGoal')}>
+                <Plus size={15} /> Add Goal
+              </Button>
+            }
+          />
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -8,6 +8,7 @@ import EditTaskModal from './EditTaskModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import AddHabitModal from './AddHabitModal';
 import EditHabitModal from './EditHabitModal';
+import AddGoalModal from './AddGoalModal';
 import AddJournalModal from './AddJournalModal';
 import DayDetailsDrawer from './DayDetailsDrawer';
 import AnalyticsBreakdownDrawer from './AnalyticsBreakdownDrawer';
@@ -24,6 +25,7 @@ export default function OverlayRoot() {
       {activeOverlay === 'deleteTask' && <DeleteConfirmModal key="deleteTask" />}
       {activeOverlay === 'addHabit' && <AddHabitModal key="addHabit" />}
       {activeOverlay === 'editHabit' && <EditHabitModal key="editHabit" />}
+      {activeOverlay === 'addGoal' && <AddGoalModal key="addGoal" />}
       {activeOverlay === 'addJournal' && <AddJournalModal key="addJournal" />}
       {activeOverlay === 'dayDetails' && <DayDetailsDrawer key="dayDetails" />}
       {activeOverlay === 'analyticsBreakdown' && <AnalyticsBreakdownDrawer key="analyticsBreakdown" />}

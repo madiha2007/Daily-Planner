@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Goal } from '@/lib/types';
 import { fetchGoals, createGoal, updateGoal, deleteGoal } from '@/lib/api/goals';
 
@@ -12,33 +13,43 @@ interface GoalState {
   removeGoal: (id: string) => Promise<void>;
 }
 
-export const useGoalStore = create<GoalState>((set, get) => ({
-  goals: [],
-  loading: false,
-  error: null,
+export const useGoalStore = create<GoalState>()(
+  persist(
+    (set, get) => ({
+      goals: [],
+      loading: false,
+      error: null,
 
-  fetchAll: async () => {
-    set({ loading: true, error: null });
-    try {
-      const goals = await fetchGoals();
-      set({ goals, loading: false });
-    } catch (err) {
-      set({ error: (err as Error).message, loading: false });
+      fetchAll: async () => {
+        if (get().goals.length > 0) return;
+        set({ loading: true, error: null });
+        try {
+          const goals = await fetchGoals();
+          set({ goals, loading: false });
+        } catch (err) {
+          set({ error: (err as Error).message, loading: false });
+        }
+      },
+
+      addGoal: async (input) => {
+        const goal = await createGoal(input);
+        set({ goals: [...get().goals, goal] });
+      },
+
+      editGoal: async (id, updates) => {
+        const updated = await updateGoal(id, updates);
+        set({ goals: get().goals.map((g) => (g.id === id ? updated : g)) });
+      },
+
+      removeGoal: async (id) => {
+        set({ goals: get().goals.filter((g) => g.id !== id) });
+        await deleteGoal(id);
+      },
+    }),
+    {
+      name: 'daily-planner:goals',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ goals: state.goals }),
     }
-  },
-
-  addGoal: async (input) => {
-    const goal = await createGoal(input);
-    set({ goals: [...get().goals, goal] });
-  },
-
-  editGoal: async (id, updates) => {
-    const updated = await updateGoal(id, updates);
-    set({ goals: get().goals.map((g) => (g.id === id ? updated : g)) });
-  },
-
-  removeGoal: async (id) => {
-    set({ goals: get().goals.filter((g) => g.id !== id) });
-    await deleteGoal(id);
-  },
-}));
+  )
+);

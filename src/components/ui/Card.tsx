@@ -25,7 +25,7 @@ export default function Card({ children, className, onClick, as = 'div', tone = 
     <Comp
       onClick={onClick}
       className={cn(
-        'rounded-3xl p-5 shadow-soft transition-all',
+        'rounded-2xl p-5 shadow-soft transition-all',
         toneClasses[tone],
         onClick && 'cursor-pointer text-left w-full hover:-translate-y-0.5 hover:shadow-card active:translate-y-0',
         className

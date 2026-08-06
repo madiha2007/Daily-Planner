@@ -6,6 +6,7 @@ export type OverlayType =
   | 'deleteTask'
   | 'addHabit'
   | 'editHabit'
+  | 'addGoal'
   | 'addJournal'
   | 'dayDetails'
   | 'analyticsBreakdown'
