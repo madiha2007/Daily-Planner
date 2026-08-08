@@ -12,11 +12,11 @@ interface CardProps {
 }
 
 const toneClasses: Record<CardTone, string> = {
-  white: 'bg-white text-cocoa-800 border border-peach-100',
-  cream: 'bg-cream-100 text-cocoa-800 border border-peach-200',
-  peach: 'bg-peach-200 text-cocoa-800 border border-peach-300',
-  blush: 'bg-blush-100 text-cocoa-800 border border-blush-200',
-  gradient: 'bg-gradient-to-br from-peach-300 to-blush-300 text-white border border-peach-400',
+  white: 'bg-white/60 text-cocoa-800 border border-peach-100',
+  cream: 'bg-cream-100/60 text-cocoa-800 border border-peach-200',
+  peach: 'bg-peach-200/60 text-cocoa-800 border border-peach-300',
+  blush: 'bg-blush-100/60 text-cocoa-800 border border-blush-200',
+  gradient: 'bg-gradient-to-br from-peach-300/60 to-blush-300/60 text-white border border-peach-400',
 };
 
 export default function Card({ children, className, onClick, as = 'div', tone = 'white' }: CardProps) {

@@ -8,17 +8,8 @@ function delay<T>(value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), SIMULATED_DELAY_MS));
 }
 
-let _goals: Goal[] | null = null;
-
-function ensureSeeded(): Goal[] {
-  if (!_goals) {
-    _goals = generateMockGoals();
-  }
-  return _goals;
-}
-
 export async function fetchGoals(): Promise<Goal[]> {
-  return delay([...ensureSeeded()]);
+  return delay(generateMockGoals());
 }
 
 export async function createGoal(input: Omit<Goal, 'id' | 'createdAt'>): Promise<Goal> {
@@ -27,20 +18,13 @@ export async function createGoal(input: Omit<Goal, 'id' | 'createdAt'>): Promise
     id: uid(),
     createdAt: new Date().toISOString(),
   };
-  ensureSeeded().push(goal);
   return delay(goal);
 }
 
-export async function updateGoal(id: string, updates: Partial<Goal>): Promise<Goal> {
-  const goals = ensureSeeded();
-  const index = goals.findIndex((g) => g.id === id);
-  if (index === -1) throw new Error(`Goal ${id} not found`);
-  goals[index] = { ...goals[index], ...updates };
-  return delay(goals[index]);
+export async function updateGoal(id: string, updates: Partial<Goal>): Promise<void> {
+  await delay(undefined);
 }
 
-export async function deleteGoal(id: string): Promise<{ id: string }> {
-  const goals = ensureSeeded();
-  _goals = goals.filter((g) => g.id !== id);
-  return delay({ id });
+export async function deleteGoal(id: string): Promise<void> {
+  await delay(undefined);
 }

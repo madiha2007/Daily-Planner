@@ -2,12 +2,12 @@
 
 import { format, parseISO } from 'date-fns';
 import { CheckCircle2, Circle } from 'lucide-react';
-import Drawer from '@/components/ui/Drawer';
 import ProgressRing from '@/components/ui/ProgressRing';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { useGoalStore } from '@/stores/useGoalStore';
 import { Goal } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import Modal from '@/components/ui/Modal';
 
 export default function GoalDetailsDrawer() {
   const payload = useOverlayStore((s) => s.payload) as { goal: Goal } | null;
@@ -25,7 +25,7 @@ export default function GoalDetailsDrawer() {
   };
 
   return (
-    <Drawer title={goal.title}>
+    <Modal title={goal.title}>
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
           <ProgressRing progress={goal.progress} size={64} />
@@ -58,6 +58,6 @@ export default function GoalDetailsDrawer() {
           </div>
         </div>
       </div>
-    </Drawer>
+    </Modal>
   );
 }
