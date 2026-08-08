@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { Textarea, Input } from '@/components/ui/Input';
+import ImagePicker from '@/components/data/ImagePicker';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { JournalEntry } from '@/lib/types';
@@ -31,6 +32,7 @@ export default function AddJournalModal() {
   const [mood, setMood] = useState<JournalEntry['mood']>(editing?.mood ?? 'good');
   const [color, setColor] = useState(editing?.color ?? JOURNAL_COLORS[0].id);
   const [stickers, setStickers] = useState<string[]>(editing?.stickers ?? []);
+  const [image, setImage] = useState<string | undefined>(editing?.image);
   const [submitting, setSubmitting] = useState(false);
 
   const toggleSticker = (s: string) => {
@@ -44,9 +46,23 @@ export default function AddJournalModal() {
     setSubmitting(true);
     const normalizedTitle = title.trim();
     if (editing) {
-      await editEntry(editing.id, { title: normalizedTitle || '', content, mood, color, stickers });
+      await editEntry(editing.id, {
+        title: normalizedTitle || '',
+        content,
+        mood,
+        color,
+        stickers,
+        image,
+      });
     } else {
-      await addEntry({ title: normalizedTitle || '', content, mood, color, stickers });
+      await addEntry({
+        title: normalizedTitle || '',
+        content,
+        mood,
+        color,
+        stickers,
+        image,
+      });
     }
     setSubmitting(false);
     close();
@@ -89,6 +105,8 @@ export default function AddJournalModal() {
           onChange={(e) => setContent(e.target.value)}
         />
 
+        <ImagePicker value={image} onChange={setImage} />
+
         <div>
           <p className="mb-2 text-sm font-medium text-cocoa-700">Color</p>
           <div className="flex gap-2">
@@ -130,19 +148,24 @@ export default function AddJournalModal() {
         </div>
 
         <div
-          className="rounded-2xl border border-peach-100 p-3 text-sm text-cocoa-600"
+          className="flex gap-3 rounded-2xl border border-peach-100 p-3 text-sm text-cocoa-600"
           style={{ backgroundColor: swatch.soft }}
         >
-          <p className="mb-1 text-xs font-medium text-cocoa-500">Preview</p>
-          {title && <p className="font-semibold text-cocoa-800">{title}</p>}
-          <p className="line-clamp-2">{content || 'Your entry preview will show here...'}</p>
-          {stickers.length > 0 && (
-            <div className="mt-1 flex gap-1">
-              {stickers.map((s, i) => (
-                <span key={i}>{s}</span>
-              ))}
-            </div>
+          {image && (
+            <img src={image} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
           )}
+          <div className="min-w-0">
+            <p className="mb-1 text-xs font-medium text-cocoa-500">Preview</p>
+            {title && <p className="font-semibold text-cocoa-800">{title}</p>}
+            <p className="line-clamp-2">{content || 'Your entry preview will show here...'}</p>
+            {stickers.length > 0 && (
+              <div className="mt-1 flex gap-1">
+                {stickers.map((s, i) => (
+                  <span key={i}>{s}</span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mt-1 flex justify-end gap-2">
@@ -156,4 +179,4 @@ export default function AddJournalModal() {
       </div>
     </Modal>
   );
-}
+}  

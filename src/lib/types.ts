@@ -24,6 +24,7 @@ export interface JournalEntry {
   mood: 'great' | 'good' | 'okay' | 'low' | 'rough';
   color: string;       // id from JOURNAL_COLORS
   stickers: string[];  // up to 6 emoji
+  image?: string;      // optional image URL
   createdAt: string;
 }
 
