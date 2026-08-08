@@ -4,23 +4,22 @@ import { useEffect } from 'react';
 import Skeleton from '@/components/ui/Skeleton';
 import { useTaskStore } from '@/stores/useTaskStore';
 import { useHabitStore } from '@/stores/useHabitStore';
-import { useActivityStore } from '@/stores/useActivityStore';
+import { useDerivedActivity } from '@/hooks/useDerivedActivity';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 import { formatDateISO } from '@/lib/utils';
 
 export default function OverviewSection() {
   const { tasks, loading: tasksLoading, fetchAll: fetchTasks } = useTaskStore();
   const { habits, loading: habitsLoading, fetchAll: fetchHabits } = useHabitStore();
-  const { days, loading: activityLoading, fetchAll: fetchActivity } = useActivityStore();
+  const days = useDerivedActivity(91);
   const scrollTo = useScrollToSection();
 
   useEffect(() => {
     fetchTasks();
     fetchHabits();
-    fetchActivity();
-  }, [fetchTasks, fetchHabits, fetchActivity]);
+  }, [fetchTasks, fetchHabits]);
 
-  const loading = tasksLoading || habitsLoading || activityLoading;
+  const loading = tasksLoading || habitsLoading;
 
   const doneTasks = tasks.filter((t) => t.done).length;
   const progressPct = tasks.length ? Math.round((doneTasks / tasks.length) * 100) : 0;

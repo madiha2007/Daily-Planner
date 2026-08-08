@@ -1,68 +1,54 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import Drawer from '@/components/ui/Drawer';
-import Skeleton from '@/components/ui/Skeleton';
-import { fetchDayActivity } from '@/lib/api/activity';
-import { DayActivity } from '@/lib/types';
+import Modal from '@/components/ui/Modal';
+import { useDerivedActivity } from '@/hooks/useDerivedActivity';
 
 export default function AnalyticsBreakdownDrawer() {
-  const [data, setData] = useState<DayActivity[] | null>(null);
+  const days = useDerivedActivity(14);
 
-  useEffect(() => {
-    fetchDayActivity(14).then(setData);
-  }, []);
-
-  const chartData = (data ?? []).map((d) => ({
+  const chartData = days.map((d) => ({
     date: format(parseISO(d.date), 'MMM d'),
     tasks: d.tasksCompleted,
     habits: d.habitsCompleted,
   }));
 
-  return (
-    <Drawer title="Analytics Breakdown" widthClass="w-full sm:w-[520px]">
-      {!data ? (
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-64 w-full" />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <div>
-            <p className="mb-2 text-sm font-medium text-neutral-700">Last 14 days</p>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="#a3a3a3" />
-                  <YAxis tick={{ fontSize: 11 }} stroke="#a3a3a3" allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{ borderRadius: 12, border: '1px solid #e5e5e5', fontSize: 12 }}
-                  />
-                  <Bar dataKey="tasks" fill="#10b981" radius={[4, 4, 0, 0]} name="Tasks completed" />
-                  <Bar dataKey="habits" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Habits completed" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+  const avgTasks = (chartData.reduce((sum, d) => sum + d.tasks, 0) / (chartData.length || 1)).toFixed(1);
+  const avgHabits = (chartData.reduce((sum, d) => sum + d.habits, 0) / (chartData.length || 1)).toFixed(1);
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-neutral-200 p-4">
-              <p className="text-xs text-neutral-400">Avg tasks/day</p>
-              <p className="text-xl font-semibold text-neutral-900">
-                {(chartData.reduce((sum, d) => sum + d.tasks, 0) / (chartData.length || 1)).toFixed(1)}
-              </p>
-            </div>
-            <div className="rounded-xl border border-neutral-200 p-4">
-              <p className="text-xs text-neutral-400">Avg habits/day</p>
-              <p className="text-xl font-semibold text-neutral-900">
-                {(chartData.reduce((sum, d) => sum + d.habits, 0) / (chartData.length || 1)).toFixed(1)}
-              </p>
-            </div>
+  return (
+    <Modal title="Analytics Breakdown" maxWidth="max-w-xl">
+      <div className="flex flex-col gap-6">
+        <div>
+          <p className="mb-2 text-sm font-medium text-cocoa-700">Last 14 days</p>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f5e0bf" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="#a6795f" />
+                <YAxis tick={{ fontSize: 11 }} stroke="#a6795f" allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: '1px solid #ffc9a3', fontSize: 12 }}
+                />
+                <Bar dataKey="tasks" fill="#f5804a" radius={[4, 4, 0, 0]} name="Tasks completed" />
+                <Bar dataKey="habits" fill="#e5808f" radius={[4, 4, 0, 0]} name="Habits completed" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
-      )}
-    </Drawer>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-peach-200 bg-white p-4">
+            <p className="text-xs text-cocoa-400">Avg tasks/day</p>
+            <p className="text-xl font-semibold text-cocoa-800">{avgTasks}</p>
+          </div>
+          <div className="rounded-xl border border-peach-200 bg-white p-4">
+            <p className="text-xs text-cocoa-400">Avg habits/day</p>
+            <p className="text-xl font-semibold text-cocoa-800">{avgHabits}</p>
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 }
