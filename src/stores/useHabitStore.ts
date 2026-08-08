@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Habit } from '@/lib/types';
 import { fetchHabits, createHabit, updateHabit, toggleHabitToday, deleteHabit } from '@/lib/api/habits';
+import { formatDateISO } from '@/lib/utils';
 
 interface HabitState {
   habits: Habit[];
@@ -38,13 +39,20 @@ export const useHabitStore = create<HabitState>()(
       },
 
       editHabit: async (id, updates) => {
-        const updated = await updateHabit(id, updates);
-        set({ habits: get().habits.map((h) => (h.id === id ? updated : h)) });
+        set({ habits: get().habits.map((h) => (h.id === id ? { ...h, ...updates } : h)) });
+        await updateHabit(id, updates);
       },
 
       toggleToday: async (id) => {
-        const updated = await toggleHabitToday(id);
-        set({ habits: get().habits.map((h) => (h.id === id ? updated : h)) });
+        const habit = get().habits.find((h) => h.id === id);
+        if (!habit) return;
+        const today = formatDateISO(new Date());
+        const hasToday = habit.completions.includes(today);
+        const completions = hasToday
+          ? habit.completions.filter((d) => d !== today)
+          : [...habit.completions, today];
+        set({ habits: get().habits.map((h) => (h.id === id ? { ...h, completions } : h)) });
+        await toggleHabitToday(id);
       },
 
       removeHabit: async (id) => {

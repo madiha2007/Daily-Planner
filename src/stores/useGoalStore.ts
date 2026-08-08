@@ -37,8 +37,8 @@ export const useGoalStore = create<GoalState>()(
       },
 
       editGoal: async (id, updates) => {
-        const updated = await updateGoal(id, updates);
-        set({ goals: get().goals.map((g) => (g.id === id ? updated : g)) });
+        set({ goals: get().goals.map((g) => (g.id === id ? { ...g, ...updates } : g)) });
+        await updateGoal(id, updates);
       },
 
       removeGoal: async (id) => {
