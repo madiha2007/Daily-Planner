@@ -3,9 +3,10 @@
 import { format, parseISO } from 'date-fns';
 import { Trash2 } from 'lucide-react';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import { JournalEntry } from '@/lib/types';
 import { useJournalStore } from '@/stores/useJournalStore';
+import { useOverlayStore } from '@/stores/useOverlayStore';
+import { JOURNAL_COLORS } from '@/lib/theme/journalPalette';
 
 const moodEmoji: Record<JournalEntry['mood'], string> = {
   great: '😄',
@@ -15,33 +16,61 @@ const moodEmoji: Record<JournalEntry['mood'], string> = {
   rough: '😣',
 };
 
-const moodTone: Record<JournalEntry['mood'], 'peach' | 'cream' | 'neutral' | 'blush' | 'red'> = {
-  great: 'peach',
-  good: 'cream',
-  okay: 'neutral',
-  low: 'blush',
-  rough: 'red',
-};
-
 export default function JournalEntryCard({ entry }: { entry: JournalEntry }) {
   const removeEntry = useJournalStore((s) => s.removeEntry);
+  const open = useOverlayStore((s) => s.open);
+
+  const swatch = JOURNAL_COLORS.find((c) => c.id === entry.color) ?? JOURNAL_COLORS[0];
 
   return (
-    <Card className="group relative">
-      <div className="flex items-start justify-between mb-2">
-        <Badge tone={moodTone[entry.mood]}>
-          {moodEmoji[entry.mood]} {entry.mood}
-        </Badge>
-        <span className="text-xs text-cocoa-400">{format(parseISO(entry.createdAt), 'MMM d')}</span>
+    <div
+      className="group relative flex cursor-pointer flex-col rounded-xl p-4 transition-all hover:-translate-y-0.5 hover:shadow-card"
+      style={{ backgroundColor: swatch.soft }}
+      onClick={() => open('addJournal', { entry })}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open('addJournal', { entry });
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="flex items-start justify-between">
+        <span
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base shadow-warm"
+          style={{ backgroundColor: swatch.hex }}
+        >
+          {moodEmoji[entry.mood]}
+        </span>
+        <span className="text-[11px] text-cocoa-400">
+          {format(parseISO(entry.createdAt), 'MMM d · h:mma')}
+        </span>
       </div>
-      <p className="text-sm text-cocoa-700 line-clamp-3">{entry.content}</p>
+
+      {entry.title && (
+        <h4 className="mt-2 text-sm font-semibold text-cocoa-800 line-clamp-1">{entry.title}</h4>
+      )}
+      <p className="mt-1 text-sm text-cocoa-700 line-clamp-3">{entry.content}</p>
+
+      {entry.stickers?.length > 0 && (
+        <div className="mt-2 flex gap-1 text-sm">
+          {entry.stickers?.slice(0, 6).map((s, i) => (
+            <span key={i}>{s}</span>
+          ))}
+        </div>
+      )}
+
       <button
-        onClick={() => removeEntry(entry.id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          removeEntry(entry.id);
+        }}
         aria-label="Delete journal entry"
-        className="absolute right-3 bottom-3 rounded-lg p-1.5 text-cocoa-300 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-400 transition-opacity"
+        className="absolute bottom-3 right-3 rounded-lg p-1.5 text-cocoa-400 opacity-0 transition-opacity hover:bg-white/60 hover:text-red-400 group-hover:opacity-100"
       >
         <Trash2 size={14} />
       </button>
-    </Card>
+    </div>
   );
 }

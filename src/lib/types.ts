@@ -19,8 +19,11 @@ export interface Habit {
 
 export interface JournalEntry {
   id: string;
+  title: string;
   content: string;
   mood: 'great' | 'good' | 'okay' | 'low' | 'rough';
+  color: string;       // id from JOURNAL_COLORS
+  stickers: string[];  // up to 6 emoji
   createdAt: string;
 }
 

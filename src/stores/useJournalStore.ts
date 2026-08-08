@@ -9,6 +9,7 @@ interface JournalState {
   error: string | null;
   fetchAll: () => Promise<void>;
   addEntry: (input: Omit<JournalEntry, 'id' | 'createdAt'>) => Promise<void>;
+  editEntry: (id: string, updates: Partial<JournalEntry>) => Promise<void>;
   removeEntry: (id: string) => Promise<void>;
 }
 
@@ -33,6 +34,10 @@ export const useJournalStore = create<JournalState>()(
       addEntry: async (input) => {
         const entry = await createJournalEntry(input);
         set({ entries: [entry, ...get().entries] });
+      },
+
+      editEntry: async (id, updates) => {
+        set({ entries: get().entries.map((e) => (e.id === id ? { ...e, ...updates } : e)) });
       },
 
       removeEntry: async (id) => {

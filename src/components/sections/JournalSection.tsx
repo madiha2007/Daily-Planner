@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Plus, BookOpen } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import { Plus, BookHeart } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
@@ -9,6 +10,9 @@ import EmptyState from '@/components/ui/EmptyState';
 import JournalEntryCard from '@/components/data/JournalEntryCard';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useOverlayStore } from '@/stores/useOverlayStore';
+import { formatDateISO } from '@/lib/utils';
+
+const PREVIEW_LIMIT = 5;
 
 export default function JournalSection() {
   const { entries, loading, fetchAll } = useJournalStore();
@@ -18,26 +22,33 @@ export default function JournalSection() {
     fetchAll();
   }, [fetchAll]);
 
+  const today = formatDateISO(new Date());
+  const todayEntries = useMemo(
+    () => entries.filter((e) => formatDateISO(new Date(e.createdAt)) === today),
+    [entries, today]
+  );
+  const preview = todayEntries.slice(0, PREVIEW_LIMIT);
+
   return (
-    <section id="journal" className="scroll-mt-20 rounded-2xl pb-4">
+    <section id="journal" className="scroll-mt-20 rounded-2xl">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-neutral-900">Journal</h2>
+        <h2 className="text-lg font-semibold text-cocoa-800">Today&apos;s Journal</h2>
         <Button size="sm" onClick={() => open('addJournal')}>
           <Plus size={15} /> New Entry
         </Button>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
         </div>
-      ) : entries.length === 0 ? (
+      ) : preview.length === 0 ? (
         <Card>
           <EmptyState
-            icon={BookOpen}
-            title="No entries yet"
-            message="Write your first journal entry to reflect on your day."
+            icon={BookHeart}
+            title="No entries today"
+            message="Write down how today went."
             action={
               <Button size="sm" onClick={() => open('addJournal')}>
                 <Plus size={15} /> New Entry
@@ -46,10 +57,21 @@ export default function JournalSection() {
           />
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {entries.map((entry) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {preview.map((entry) => (
             <JournalEntryCard key={entry.id} entry={entry} />
           ))}
+        </div>
+      )}
+
+      {entries.length > 0 && (
+        <div className="mt-3 text-right">
+          <Link
+            href="/dashboard/journal"
+            className="text-xs italic text-cocoa-400 underline decoration-peach-300 underline-offset-2 hover:text-peach-600"
+          >
+            more..
+          </Link>
         </div>
       )}
     </section>
