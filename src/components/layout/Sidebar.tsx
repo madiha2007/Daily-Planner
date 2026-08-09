@@ -20,8 +20,8 @@ import { useOverlayStore } from '@/stores/useOverlayStore';
 
 const sections = [
   { id: 'overview', label: 'Home', icon: Home },
-  { id: 'calendar', label: 'Calendar', icon: Calendar },
   { id: 'tasks', label: 'Tasks', icon: PlusCircle },
+  { id: 'calendar', label: 'Calendar', icon: Calendar },
   { id: 'habits', label: 'Habits', icon: Repeat },
   { id: 'heatmap', label: 'Activity', icon: Flame },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -55,7 +55,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-20 shrink-0 flex-col items-center justify-between py-6 bg-peach-100">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-20 shrink-0 flex flex-col items-center justify-between py-6 bg-peach-100">
       <div className="flex flex-col items-center gap-1">
         <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-soft text-peach-500">
           <span className="font-script text-2xl">M</span>

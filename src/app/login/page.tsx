@@ -61,12 +61,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center  px-4 py-10">
-      <div className="relative flex h-[90vh] w-[92vw] max-w-[1600px] overflow-hidden rounded-[2rem] bg-white shadow-2xl">
+    <div className="flex min-h-screen items-center justify-center  px-4 py-10 bg-gradient-to-r from-rose-400 to-orange-300">
+      <div className="relative flex h-[90vh] w-[72vw] max-w-[1600px] overflow-hidden rounded-[2rem] bg-white shadow-2xl">
 
         {/* Left illustration panel */}
         <div className="hidden md:flex  flex-col justify-between bg-rose-100 p-8">
-          <span className="text-5xl font-jacquarda text-rose-500">Daily Planner & Life Tracker</span>
+          <h1 className="text-5xl font-script text-rose-500">Daily Planner & Life Tracker</h1>
           <Image
             src="/login.jpg"
             alt="Auth illustration"
