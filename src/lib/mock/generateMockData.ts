@@ -58,14 +58,25 @@ export function generateMockJournal(): JournalEntry[] {
   const today = new Date();
   const moods: JournalEntry['mood'][] = ['great', 'good', 'okay', 'low', 'rough'];
   return Array.from({ length: 4 }).map((_, i) => ({
-    id: uid(),
-    content:
-      i === 0
-        ? 'Felt productive today, finished the reading ahead of schedule.'
-        : 'Reflected on the week and adjusted my study plan for the exam.',
-    mood: moods[Math.floor(Math.random() * moods.length)],
-    createdAt: formatDateISO(subDays(today, i * 2)),
-  }));
+  id: uid(),
+
+  title: `Journal ${i + 1}`,
+
+  content:
+    i === 0
+      ? "Today was productive..."
+      : "Had a normal day.",
+
+  mood: moods[i],
+
+  color: "#FFE6E2",
+
+  stickers: [],
+
+  imagePosition: "top",
+
+  createdAt: today.toISOString(),
+}));
 }
 
 export function generateMockGoals(): Goal[] {
