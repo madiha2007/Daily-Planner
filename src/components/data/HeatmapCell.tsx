@@ -13,7 +13,13 @@ const intensityClasses: Record<DayActivity['intensity'], string> = {
   4: 'bg-peach-600',
 };
 
-export default function HeatmapCell({ day }: { day: DayActivity }) {
+export default function HeatmapCell({
+  day,
+  sizeClassName = 'h-3.5 w-3.5',
+}: {
+  day: DayActivity;
+  sizeClassName?: string;
+}) {
   const open = useOverlayStore((s) => s.open);
   const label = `${format(parseISO(day.date), 'MMM d, yyyy')}, activity level ${day.intensity} of 4`;
 
@@ -23,7 +29,8 @@ export default function HeatmapCell({ day }: { day: DayActivity }) {
       aria-label={label}
       title={label}
       className={cn(
-        'h-3.5 w-3.5 rounded-[3px] transition-transform hover:scale-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-peach-400',
+        'shrink-0 rounded-[3px] transition-transform hover:scale-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-peach-400',
+        sizeClassName,
         intensityClasses[day.intensity]
       )}
     />

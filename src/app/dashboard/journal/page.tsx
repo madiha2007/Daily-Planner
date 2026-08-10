@@ -57,9 +57,9 @@ export default function JournalPage() {
   return (
     <div className="min-h-screen bg-cream-50">
       <Sidebar />
-      <div className="px-6 py-8 sm:px-10 md:pl-28">
+      <div className="py-6 pl-24 pr-4 sm:py-8 sm:pl-28 sm:pr-6 md:pl-32 md:pr-10">
         <div className="w-full">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Link
                 href="/dashboard"
@@ -69,39 +69,39 @@ export default function JournalPage() {
               </Link>
               <h1 className="text-2xl font-semibold text-cocoa-800">Journal</h1>
             </div>
-            <Button onClick={() => open('addJournal')}>
+            <Button onClick={() => open('addJournal')} className="w-full sm:w-auto">
               <Plus size={16} /> New Entry
             </Button>
           </div>
 
           <div className="mb-6 flex flex-wrap gap-2">
-  <button
-    onClick={() => setMoodFilter(null)}
-    className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
-      moodFilter === null
-        ? 'border-peach-400 bg-peach-400 text-white'
-        : 'border-peach-200 bg-white text-cocoa-500 hover:bg-peach-50'
-    }`}
-  >
-    All
-  </button>
-  {MOODS.map((m) => (
-    <button
-      key={m.id}
-      onClick={() => setMoodFilter(m.id)}
-      className={`flex items-center gap-1.5 rounded-full border py-1 pl-1.5 pr-3 text-xs transition-colors ${
-        moodFilter === m.id
-          ? 'border-peach-400 bg-peach-400 text-white'
-          : 'border-peach-200 bg-white text-cocoa-500 hover:bg-peach-50'
-      }`}
-    >
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/60">
-        <AnimatedMoodEmoji mood={m.id} size={16} />
-      </span>
-      {m.label}
-    </button>
-  ))}
-</div>
+            <button
+              onClick={() => setMoodFilter(null)}
+              className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                moodFilter === null
+                  ? 'border-peach-400 bg-peach-400 text-white'
+                  : 'border-peach-200 bg-white text-cocoa-500 hover:bg-peach-50'
+              }`}
+            >
+              All
+            </button>
+            {MOODS.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => setMoodFilter(m.id)}
+                className={`flex items-center gap-1.5 rounded-full border py-1 pl-1.5 pr-3 text-xs transition-colors ${
+                  moodFilter === m.id
+                    ? 'border-peach-400 bg-peach-400 text-white'
+                    : 'border-peach-200 bg-white text-cocoa-500 hover:bg-peach-50'
+                }`}
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/60">
+                  <AnimatedMoodEmoji mood={m.id} size={16} />
+                </span>
+                {m.label}
+              </button>
+            ))}
+          </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-[3fr_7fr]">
             <JournalIndex entries={indexEntries} />
