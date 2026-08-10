@@ -8,6 +8,7 @@ export type OverlayType =
   | 'editHabit'
   | 'addGoal'
   | 'addJournal'
+  | 'viewJournal'
   | 'dayDetails'
   | 'analyticsBreakdown'
   | 'goalDetails'

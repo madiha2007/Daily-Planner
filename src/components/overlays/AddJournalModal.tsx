@@ -54,8 +54,9 @@ export default function AddJournalModal() {
   const onSubmit = async () => {
     if (!content.trim()) return;
     setSubmitting(true);
+    const normalizedTitle = title.trim();
     const payloadData = {
-      title: title.trim() || undefined,
+      title: normalizedTitle,
       content,
       mood,
       color,

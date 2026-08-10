@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Plus, BookHeart, ArrowRight } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -17,6 +17,7 @@ const PREVIEW_LIMIT = 5;
 export default function JournalSection() {
   const { entries, loading, fetchAll } = useJournalStore();
   const open = useOverlayStore((s) => s.open);
+  const router = useRouter();
 
   useEffect(() => {
     fetchAll();
@@ -34,19 +35,11 @@ export default function JournalSection() {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-cocoa-800">Today&apos;s Journal</h2>
 
-      {entries.length > 0 && (
-        <div className="mt-3 text-right">
-          <Link
-            href="/dashboard/journal"
-            className="text-xs italic text-cocoa-400 underline decoration-peach-300 underline-offset-2 hover:text-peach-600"
-          >
-        <Button size="sm" >
-          Go to Journal page <ArrowRight size={15} />
-        </Button>
-          </Link>
-        </div>
-      )}
-        
+        {entries.length > 0 && (
+          <Button size="sm" onClick={() => router.push('/dashboard/journal')}>
+            Go to Journal page <ArrowRight size={15} />
+          </Button>
+        )}
       </div>
 
       {loading ? (
@@ -68,14 +61,12 @@ export default function JournalSection() {
           />
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div>
           {preview.map((entry) => (
             <JournalEntryCard key={entry.id} entry={entry} />
           ))}
         </div>
       )}
-
-
     </section>
   );
 }

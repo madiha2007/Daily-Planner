@@ -27,68 +27,68 @@ export default function JournalEntryCard({ entry }: { entry: JournalEntry }) {
   const imagePosition = entry.imagePosition ?? 'top';
   const [imgFailed, setImgFailed] = useState(false);
 
-
   const onDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     removeEntry(entry.id);
   };
 
   if (imagePosition === 'left') {
-    return (
-      <Card
-        className=" group relative flex cursor-pointer overflow-hidden p-0 transition-all hover:-translate-y-0.5 hover:shadow-card"
-        onClick={() => open('addJournal', { entry })}
+  return (
+    <Card
+      className="group relative flex cursor-pointer flex-col overflow-hidden p-0 transition-all hover:-translate-y-0.5 hover:shadow-card sm:flex-row"
+      onClick={() => open('viewJournal', { entry })}
+    >
+      <div
+        className="relative h-40 w-full shrink-0 sm:h-auto sm:w-32 sm:min-w-[8rem]"
+        style={!entry.image ? { backgroundColor: swatch.hex } : undefined}
       >
-        <div
-          className="relative  min-w-[280px] shrink-0 sm:w-32"
-          style={!entry.image ? { backgroundColor: swatch.hex } : undefined}
-        >
-{entry.image && !imgFailed ? (
-  <img
-    src={entry.image}
-    alt=""
-    className="h-full w-full object-cover"
-    onError={() => setImgFailed(true)}
-  />
-) : (
-  <div className="flex h-full items-center justify-center text-4xl">{moodEmoji[entry.mood]}</div>
-)}
-        </div>
+        {entry.image && !imgFailed ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={entry.image}
+            alt=""
+            className="h-full w-full object-cover"
+            onError={() => setImgFailed(true)}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-4xl">{moodEmoji[entry.mood]}</div>
+        )}
+      </div>
 
-<div className="flex min-w-0 flex-1 flex-col p-4 min-h-[30vh]" style={{ backgroundColor: swatch.soft }}>
-          <div className="flex items-start justify-between align-center gap-2">
-            {entry.title && (
-              <h4 className="min-w-0 flex-1 text-sm font-semibold align-center text-cocoa-800 line-clamp-1">
-                {entry.title}
-              </h4>
-            )}
-            <span className="shrink-0 text-[11px] text-cocoa-400">{dateLabel}</span>
-          </div>
-          <p className="mt-1 flex-1 text-sm text-cocoa-700 line-clamp-3">{entry.content}</p>
-          {stickers.length > 0 && (
-            <div className="mt-2 flex gap-1 text-sm">
-              {stickers.slice(0, 6).map((s, i) => (
-                <span key={i}>{s}</span>
-              ))}
-            </div>
+      <div className="flex min-h-[30vh] min-w-0 flex-1 flex-col p-4" style={{ backgroundColor: swatch.soft }}>
+        <div className="flex items-start justify-between gap-2">
+          {entry.title && (
+            <h4 className="min-w-0 flex-1 text-sm font-semibold text-cocoa-800 line-clamp-1">
+              {entry.title}
+            </h4>
           )}
+          <span className="shrink-0 text-[11px] text-cocoa-400">{dateLabel}</span>
         </div>
+        <p className="mt-1 flex-1 text-sm text-cocoa-700 line-clamp-3">{entry.content}</p>
+        {stickers.length > 0 && (
+          <div className="mt-2 flex gap-1 text-sm">
+            {stickers.slice(0, 6).map((s, i) => (
+              <span key={i}>{s}</span>
+            ))}
+          </div>
+        )}
+      </div>
 
-        <button
-          onClick={onDelete}
-          aria-label="Delete journal entry"
-          className="absolute bottom-2 right-2 rounded-lg bg-white/70 p-1.5 text-cocoa-400 opacity-0 transition-opacity hover:bg-white hover:text-red-400 group-hover:opacity-100"
-        >
-          <Trash2 size={14} />
-        </button>
-      </Card>
-    );
-  }
+      <button
+        onClick={onDelete}
+        aria-label="Delete journal entry"
+        className="absolute bottom-2 right-2 rounded-lg bg-white/70 p-1.5 text-cocoa-400 opacity-0 transition-opacity hover:bg-white hover:text-red-400 group-hover:opacity-100"
+      >
+        <Trash2 size={14} />
+      </button>
+    </Card>
+  );
+}
 
   return (
     <Card
-      className="group relative flex cursor-pointer flex-col overflow-hidden p-0 transition-all hover:-translate-y-0.5 hover:shadow-card"
-      onClick={() => open('addJournal', { entry })}
+      className="group relative flex min-h-[30vh] cursor-pointer flex-col overflow-hidden p-0 transition-all hover:-translate-y-0.5 hover:shadow-card"
+      onClick={() => open('viewJournal', { entry })}
     >
       <div className="relative h-36 w-full shrink-0" style={!entry.image ? { backgroundColor: swatch.hex } : undefined}>
         {entry.image && (

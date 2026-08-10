@@ -11,9 +11,18 @@ interface ModalProps {
   description?: string;
   children: ReactNode;
   maxWidth?: string;
+  contentClassName?: string;
+  closeButtonClassName?: string;
 }
 
-export default function Modal({ title, description, children, maxWidth = 'max-w-lg' }: ModalProps) {
+export default function Modal({
+  title,
+  description,
+  children,
+  maxWidth = 'max-w-lg',
+  contentClassName = 'border border-peach-200 bg-cream-100',
+  closeButtonClassName = 'text-cocoa-400 hover:bg-peach-100 hover:text-cocoa-600',
+}: ModalProps) {
   const close = useOverlayStore((s) => s.close);
 
   return (
@@ -29,12 +38,11 @@ export default function Modal({ title, description, children, maxWidth = 'max-w-
           />
         </Dialog.Overlay>
 
-        {/* Fixed full-screen flex wrapper guarantees true viewport centering regardless of page scroll */}
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <Dialog.Content asChild aria-describedby={description ? 'modal-description' : undefined}>
             <motion.div
-              className={`w-full ${maxWidth} rounded-xl border border-peach-200 bg-cream-100 p-6 shadow-warm
-                          focus:outline-none max-h-[85vh] overflow-y-auto`}
+              className={`w-full ${maxWidth} rounded-xl p-6 shadow-warm
+                          focus:outline-none max-h-[85vh] overflow-y-auto ${contentClassName}`}
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
@@ -52,7 +60,7 @@ export default function Modal({ title, description, children, maxWidth = 'max-w-
                 <Dialog.Close asChild>
                   <button
                     aria-label="Close"
-                    className="rounded-full p-1.5 text-cocoa-400 hover:bg-peach-100 hover:text-cocoa-600"
+                    className={`rounded-full p-1.5 ${closeButtonClassName}`}
                   >
                     <X size={18} />
                   </button>
