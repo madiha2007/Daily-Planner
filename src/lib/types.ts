@@ -25,6 +25,7 @@ export interface JournalEntry {
   color: string;       // id from JOURNAL_COLORS
   stickers: string[];  // up to 6 emoji
   image?: string;      // optional image URL
+  imagePosition: 'top' | 'left';     // only matters when image is set
   createdAt: string;
 }
 

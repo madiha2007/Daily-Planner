@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, BookHeart } from 'lucide-react';
+import { Plus, BookHeart, ArrowRight } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
@@ -33,9 +33,20 @@ export default function JournalSection() {
     <section id="journal" className="scroll-mt-20 rounded-2xl">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-cocoa-800">Today&apos;s Journal</h2>
-        <Button size="sm" onClick={() => open('addJournal')}>
-          <Plus size={15} /> New Entry
+
+      {entries.length > 0 && (
+        <div className="mt-3 text-right">
+          <Link
+            href="/dashboard/journal"
+            className="text-xs italic text-cocoa-400 underline decoration-peach-300 underline-offset-2 hover:text-peach-600"
+          >
+        <Button size="sm" >
+          Go to Journal page <ArrowRight size={15} />
         </Button>
+          </Link>
+        </div>
+      )}
+        
       </div>
 
       {loading ? (
@@ -64,16 +75,7 @@ export default function JournalSection() {
         </div>
       )}
 
-      {entries.length > 0 && (
-        <div className="mt-3 text-right">
-          <Link
-            href="/dashboard/journal"
-            className="text-xs italic text-cocoa-400 underline decoration-peach-300 underline-offset-2 hover:text-peach-600"
-          >
-            more..
-          </Link>
-        </div>
-      )}
+
     </section>
   );
 }

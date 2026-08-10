@@ -21,6 +21,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      <JournalSection />
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <HeatmapSection />
@@ -32,7 +34,7 @@ export default function DashboardPage() {
 
       <AnalyticsSection />
       <GoalsSection />
-      <JournalSection />
+      
       <OverlayRoot />
     </DashboardShell>
   );

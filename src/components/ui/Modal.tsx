@@ -33,7 +33,7 @@ export default function Modal({ title, description, children, maxWidth = 'max-w-
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <Dialog.Content asChild aria-describedby={description ? 'modal-description' : undefined}>
             <motion.div
-              className={`w-full ${maxWidth} rounded-3xl border border-peach-200 bg-cream-100 p-6 shadow-warm
+              className={`w-full ${maxWidth} rounded-xl border border-peach-200 bg-cream-100 p-6 shadow-warm
                           focus:outline-none max-h-[85vh] overflow-y-auto`}
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

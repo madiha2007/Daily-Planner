@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { X, Check } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { Textarea, Input } from '@/components/ui/Input';
-import ImagePicker from '@/components/data/ImagePicker';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { JournalEntry } from '@/lib/types';
 import { JOURNAL_COLORS, JOURNAL_STICKERS } from '@/lib/theme/journalPalette';
+import { JOURNAL_IMAGES } from '@/lib/theme/journalImages';
 import { cn } from '@/lib/utils';
 
 const MOODS: { id: JournalEntry['mood']; emoji: string; label: string }[] = [
@@ -33,6 +34,7 @@ export default function AddJournalModal() {
   const [color, setColor] = useState(editing?.color ?? JOURNAL_COLORS[0].id);
   const [stickers, setStickers] = useState<string[]>(editing?.stickers ?? []);
   const [image, setImage] = useState<string | undefined>(editing?.image);
+  const [imagePosition, setImagePosition] = useState<'top' | 'left'>(editing?.imagePosition ?? 'top');
   const [submitting, setSubmitting] = useState(false);
 
   const toggleSticker = (s: string) => {
@@ -41,28 +43,30 @@ export default function AddJournalModal() {
     );
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
   const onSubmit = async () => {
     if (!content.trim()) return;
     setSubmitting(true);
-    const normalizedTitle = title.trim();
+    const payloadData = {
+      title: title.trim() || undefined,
+      content,
+      mood,
+      color,
+      stickers,
+      image,
+      imagePosition,
+    };
     if (editing) {
-      await editEntry(editing.id, {
-        title: normalizedTitle || '',
-        content,
-        mood,
-        color,
-        stickers,
-        image,
-      });
+      await editEntry(editing.id, payloadData);
     } else {
-      await addEntry({
-        title: normalizedTitle || '',
-        content,
-        mood,
-        color,
-        stickers,
-        image,
-      });
+      await addEntry(payloadData);
     }
     setSubmitting(false);
     close();
@@ -72,7 +76,7 @@ export default function AddJournalModal() {
 
   return (
     <Modal title={editing ? 'Edit Entry' : 'New Journal Entry'} maxWidth="max-w-lg">
-      <div className="flex flex-col gap-4">
+      <div className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto pr-1">
         <div className="flex justify-between gap-2">
           {MOODS.map((m) => (
             <button
@@ -105,8 +109,6 @@ export default function AddJournalModal() {
           onChange={(e) => setContent(e.target.value)}
         />
 
-        <ImagePicker value={image} onChange={setImage} />
-
         <div>
           <p className="mb-2 text-sm font-medium text-cocoa-700">Color</p>
           <div className="flex gap-2">
@@ -124,6 +126,76 @@ export default function AddJournalModal() {
               />
             ))}
           </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-cocoa-700">Photo (optional)</p>
+
+          {image ? (
+            <div className="relative mb-3 h-28 w-full overflow-hidden rounded-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={image} alt="" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => setImage(undefined)}
+                className="absolute right-2 top-2 rounded-full bg-white/90 p-1 text-cocoa-600 hover:text-red-400"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="mb-1.5 text-xs text-cocoa-400">Pick a preset</p>
+              <div className="mb-3 grid grid-cols-5 gap-2">
+                {JOURNAL_IMAGES.map((img) => (
+                  <button
+                    key={img.id}
+                    type="button"
+                    onClick={() => setImage(img.src)}
+                    title={img.label}
+                    className="relative aspect-square overflow-hidden rounded-lg border border-peach-100 hover:border-peach-300"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.src} alt={img.label} className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+
+              <label className="flex h-16 w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-peach-200 text-xs text-cocoa-400 hover:border-peach-300 hover:bg-peach-50">
+                Or upload your own
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              </label>
+            </>
+          )}
+
+          {image && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setImagePosition('top')}
+                className={cn(
+                  'flex-1 rounded-lg border py-1.5 text-xs transition-colors',
+                  imagePosition === 'top'
+                    ? 'border-peach-400 bg-peach-50 text-peach-700'
+                    : 'border-peach-100 text-cocoa-500 hover:bg-peach-50'
+                )}
+              >
+                Image on top
+              </button>
+              <button
+                type="button"
+                onClick={() => setImagePosition('left')}
+                className={cn(
+                  'flex-1 rounded-lg border py-1.5 text-xs transition-colors',
+                  imagePosition === 'left'
+                    ? 'border-peach-400 bg-peach-50 text-peach-700'
+                    : 'border-peach-100 text-cocoa-500 hover:bg-peach-50'
+                )}
+              >
+                Image on left
+              </button>
+            </div>
+          )}
         </div>
 
         <div>
@@ -148,24 +220,12 @@ export default function AddJournalModal() {
         </div>
 
         <div
-          className="flex gap-3 rounded-2xl border border-peach-100 p-3 text-sm text-cocoa-600"
+          className="rounded-2xl border border-peach-100 p-3 text-sm text-cocoa-600"
           style={{ backgroundColor: swatch.soft }}
         >
-          {image && (
-            <img src={image} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
-          )}
-          <div className="min-w-0">
-            <p className="mb-1 text-xs font-medium text-cocoa-500">Preview</p>
-            {title && <p className="font-semibold text-cocoa-800">{title}</p>}
-            <p className="line-clamp-2">{content || 'Your entry preview will show here...'}</p>
-            {stickers.length > 0 && (
-              <div className="mt-1 flex gap-1">
-                {stickers.map((s, i) => (
-                  <span key={i}>{s}</span>
-                ))}
-              </div>
-            )}
-          </div>
+          <p className="mb-1 text-xs font-medium text-cocoa-500">Preview</p>
+          {title && <p className="font-semibold text-cocoa-800">{title}</p>}
+          <p className="line-clamp-2">{content || 'Your entry preview will show here...'}</p>
         </div>
 
         <div className="mt-1 flex justify-end gap-2">
@@ -179,4 +239,4 @@ export default function AddJournalModal() {
       </div>
     </Modal>
   );
-}  
+}
