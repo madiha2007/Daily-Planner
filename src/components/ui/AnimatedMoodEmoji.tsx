@@ -1,8 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Player } from '@lottiefiles/react-lottie-player';
 import { JournalEntry } from '@/lib/types';
+import dynamic from 'next/dynamic';
+
+const Player = dynamic(
+  () =>
+    import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  {
+    ssr: false,
+  }
+);
 
 const MOOD_CODEPOINTS: Record<JournalEntry['mood'], string> = {
   great: '1f604', // grinning face with smiling eyes
