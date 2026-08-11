@@ -50,14 +50,14 @@ export default function TaskItem({ task }: { task: Task }) {
         <button
           onClick={() => open('editTask', { task })}
           aria-label="Edit task"
-          className="rounded-lg p-1.5 text-cocoa-300 hover:bg-peach-100 hover:text-cocoa-600 active:bg-peach-100"
+          className="rounded-lg p-1.5 text-cocoa-100 hover:bg-peach-100 hover:text-cocoa-600 active:bg-peach-100"
         >
           <Pencil size={14} />
         </button>
         <button
           onClick={() => open('deleteTask', { task })}
           aria-label="Delete task"
-          className="rounded-lg p-1.5 text-cocoa-300 hover:bg-red-50 hover:text-red-400 active:bg-red-50"
+          className="rounded-lg p-1.5 text-cocoa-100 hover:bg-red-50 hover:text-red-400 active:bg-red-50"
         >
           <Trash2 size={14} />
         </button>

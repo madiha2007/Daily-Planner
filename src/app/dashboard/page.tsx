@@ -1,3 +1,5 @@
+'use client';
+
 import DashboardShell from '@/components/layout/DashboardShell';
 import OverlayRoot from '@/components/overlays/OverlayRoot';
 import OverviewSection from '@/components/sections/OverviewSection';
@@ -8,8 +10,11 @@ import HeatmapSection from '@/components/sections/HeatmapSection';
 import AnalyticsSection from '@/components/sections/AnalyticsSection';
 import GoalsSection from '@/components/sections/GoalsSection';
 import JournalSection from '@/components/sections/JournalSection';
+import { usePendingScrollSection } from '@/hooks/usePendingScrollSection';
 
 export default function DashboardPage() {
+  usePendingScrollSection();
+
   return (
     <DashboardShell headerRight={<OverviewSection />}>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -21,8 +26,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <JournalSection />
@@ -32,11 +35,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-        <HeatmapSection />
+      <HeatmapSection />
 
       <AnalyticsSection />
       <GoalsSection />
-      
+
       <OverlayRoot />
     </DashboardShell>
   );

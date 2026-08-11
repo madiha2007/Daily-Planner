@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Home,
@@ -21,6 +21,9 @@ import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores/useUIStore';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 import { useOverlayStore } from '@/stores/useOverlayStore';
+
+const DASHBOARD_PATH = '/dashboard';
+const PENDING_SCROLL_KEY = 'pendingScrollSection';
 
 const sections = [
   { id: 'overview', label: 'Home', icon: Home },
@@ -51,10 +54,35 @@ function SidebarTooltip({ label }: { label: string }) {
 function NavLinks({
   activeSection,
   onNavigate,
+  showLabels = false,
 }: {
   activeSection: string;
   onNavigate: (id: string) => void;
+  showLabels?: boolean;
 }) {
+  if (showLabels) {
+    return (
+      <nav className="flex w-full flex-col gap-1 px-3" aria-label="Dashboard sections">
+        {sections.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => onNavigate(id)}
+            aria-current={activeSection === id ? 'true' : undefined}
+            className={cn(
+              'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+              activeSection === id
+                ? 'bg-gradient-to-br from-peach-400 to-blush-400 text-white shadow-warm'
+                : 'text-cocoa-500 hover:bg-peach-50 hover:text-cocoa-700'
+            )}
+          >
+            <Icon size={18} className="shrink-0" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+    );
+  }
+
   return (
     <nav
       className="flex flex-col items-center gap-1 rounded-full border border-white/60 bg-white/70 backdrop-blur-sm px-2 py-3 shadow-soft"
@@ -82,7 +110,36 @@ function NavLinks({
   );
 }
 
-function FooterActions({ onLogout, onProfile }: { onLogout: () => void; onProfile: () => void }) {
+function FooterActions({
+  onLogout,
+  onProfile,
+  showLabels = false,
+}: {
+  onLogout: () => void;
+  onProfile: () => void;
+  showLabels?: boolean;
+}) {
+  if (showLabels) {
+    return (
+      <div className="flex w-full flex-col gap-1 px-3 mb-10 lg:mb-0">
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cocoa-500 hover:bg-red-50 hover:text-red-400 transition-colors"
+        >
+          <LogOut size={18} className="shrink-0" />
+          <span>Log out</span>
+        </button>
+        <button
+          onClick={onProfile}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cocoa-500 hover:bg-peach-50 transition-colors"
+        >
+          <User size={18} className="shrink-0" />
+          <span>Profile & settings</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-2 rounded-full bg-white/70 p-2 shadow-soft backdrop-blur-sm mb-10 lg:mb-0">
       <div className="group relative">
@@ -115,14 +172,25 @@ export default function Sidebar() {
   const scrollTo = useScrollToSection();
   const open = useOverlayStore((s) => s.open);
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => router.push('/login');
   const handleProfile = () => open('profileSettings');
 
   const handleNavigate = (id: string) => {
-    scrollTo(id);
     setMobileOpen(false);
+
+    if (pathname === DASHBOARD_PATH) {
+      // Already on the dashboard — just scroll.
+      scrollTo(id);
+      return;
+    }
+
+    // On a different page (e.g. /dashboard/journal): stash the target
+    // section, navigate to the dashboard, and let it consume + scroll.
+    sessionStorage.setItem(PENDING_SCROLL_KEY, id);
+    router.push(DASHBOARD_PATH);
   };
 
   return (
@@ -148,7 +216,6 @@ export default function Sidebar() {
           <Menu size={18} />
         </button>
 
-        {/* This M swaps places with the drawer's M via layoutId */}
         <AnimatePresence>
           {!mobileOpen && (
             <motion.div
@@ -183,30 +250,29 @@ export default function Sidebar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 32 }}
-              className="fixed left-0 top-0 z-50 flex h-screen w-20 flex-col items-center justify-between bg-peach-100 py-6 md:hidden"
+              className="fixed left-0 top-0 z-50 flex h-screen w-36 flex-col items-center justify-between bg-peach-100/90 py-6 md:hidden rounded-r-2xl shadow-soft"
             >
               <button
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close menu"
-                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-cocoa-400 shadow-soft"
+                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-cocoa-400 shadow-soft"
               >
                 <X size={14} />
               </button>
 
-              <div className="flex flex-col items-center gap-1">
-                {/* This M is where the navbar's M "lands" */}
+              <div className="flex w-full flex-col items-center gap-4">
                 <motion.div
                   layoutId="logo-m"
                   transition={{ type: 'spring', stiffness: 260, damping: 24 }}
-                  className="mb-4 mt-4 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-soft text-peach-500"
+                  className="mb-2 mt-4 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-soft text-peach-500"
                 >
                   <span className="font-script text-2xl">M</span>
                 </motion.div>
 
-                <NavLinks activeSection={activeSection} onNavigate={handleNavigate} />
+                <NavLinks activeSection={activeSection} onNavigate={handleNavigate} showLabels />
               </div>
 
-              <FooterActions onLogout={handleLogout} onProfile={handleProfile} />
+              <FooterActions onLogout={handleLogout} onProfile={handleProfile} showLabels />
             </motion.aside>
           </>
         )}
