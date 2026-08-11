@@ -52,6 +52,7 @@ const config: Config = {
       fontFamily: {
         sans: ['Quicksand', 'system-ui', 'sans-serif'],
         script: ['Caveat', 'cursive'],
+        journal: ['"Kalam"', 'cursive'],
       },
       backgroundImage: {
         grid: 'linear-gradient(rgba(180,120,90,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(180,120,90,0.06) 1px, transparent 1px)',

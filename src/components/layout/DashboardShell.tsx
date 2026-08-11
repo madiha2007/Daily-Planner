@@ -25,7 +25,7 @@ export default function DashboardShell({ children, headerRight }: DashboardShell
   useIntersectionSection(SECTION_IDS);
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-peach-400 to-blush-400">
+    <div className="min-h-screen bg-cream-50">
       <Sidebar />
       <div className="flex min-w-0 flex-col pl-4 pr-3 pb-3 pt-16 sm:pr-5 sm:pb-5 md:pl-[6.5rem] md:pt-5">
         <div className="flex flex-1 flex-col rounded-[2rem] bg-peach-100 bg-grid bg-grid border border-peach-200 min-w-0 shadow-soft">

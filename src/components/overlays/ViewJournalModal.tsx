@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { Pencil, Trash2 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
+import NotebookPaper, { JOURNAL_LINE_HEIGHT } from '@/components/ui/NotebookPaper';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { JournalEntry } from '@/lib/types';
@@ -48,23 +49,19 @@ export default function ViewJournalModal() {
   };
 
   return (
-<Modal
-  title=""
-  maxWidth="max-w-xl"
-  contentClassName="border border-white/40 bg-white/80 backdrop-blur-md"
-  closeButtonClassName="text-cocoa-300 hover:bg-cream-100 hover:text-cocoa-500 border border-peach-100"
->
-      <div className="-m-2 overflow-hidden rounded-2xl"
-      >
+    <Modal
+      title=""
+      maxWidth="max-w-xl"
+      contentClassName="border border-white/40 bg-white/80 backdrop-blur-md"
+      closeButtonClassName="text-cocoa-300 hover:bg-cream-100 hover:text-cocoa-500 border border-peach-100"
+    >
+      <div className="-m-2 overflow-hidden rounded-2xl">
         {entry.image && imagePosition === 'top' && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={entry.image} alt="" className="h-56 w-full object-cover" />
         )}
 
-        <div
-          className="flex flex-col gap-5 p-6"
-          style={{ backgroundColor: swatch.soft }}
-        >
+        <div className="flex flex-col gap-5 p-6" style={{ backgroundColor: swatch.soft }}>
           <div className="flex items-start gap-4">
             {entry.image && imagePosition === 'left' && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -77,10 +74,7 @@ export default function ViewJournalModal() {
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 text-xs text-cocoa-500">
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded-full text-sm"
-                  
-                >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full text-sm">
                   {moodEmoji[entry.mood]}
                 </span>
                 <span>{moodLabel[entry.mood]}</span>
@@ -93,9 +87,14 @@ export default function ViewJournalModal() {
             </div>
           </div>
 
-          <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-cocoa-700">
-            {entry.content}
-          </p>
+          <NotebookPaper className="px-10 py-2 sm:px-12">
+            <p
+              className="whitespace-pre-wrap font-journal text-[17px] text-cocoa-700"
+              style={{ lineHeight: `${JOURNAL_LINE_HEIGHT}px` }}
+            >
+              {entry.content}
+            </p>
+          </NotebookPaper>
 
           {stickers.length > 0 && (
             <div className="flex gap-2 text-xl">

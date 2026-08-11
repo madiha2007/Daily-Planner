@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Check } from 'lucide-react';
+import { X } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { Textarea, Input } from '@/components/ui/Input';
+import { Input } from '@/components/ui/Input';
+import NotebookPaper, { JOURNAL_LINE_HEIGHT } from '@/components/ui/NotebookPaper';
 import { useJournalStore } from '@/stores/useJournalStore';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { JournalEntry } from '@/lib/types';
@@ -54,9 +55,8 @@ export default function AddJournalModal() {
   const onSubmit = async () => {
     if (!content.trim()) return;
     setSubmitting(true);
-    const normalizedTitle = title.trim();
     const payloadData = {
-      title: normalizedTitle,
+      title: title.trim(),
       content,
       mood,
       color,
@@ -102,13 +102,19 @@ export default function AddJournalModal() {
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <Textarea
-          label="How was your day?"
-          rows={5}
-          placeholder="Write it out..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+        <div>
+          <label className="mb-2 block text-sm font-medium text-cocoa-700">How was your day?</label>
+          <NotebookPaper className="px-10 py-2 sm:px-12">
+            <textarea
+              rows={6}
+              placeholder="Write it out..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full resize-none bg-transparent font-journal text-[17px] text-cocoa-700 placeholder:text-cocoa-300/70 focus:outline-none"
+              style={{ lineHeight: `${JOURNAL_LINE_HEIGHT}px` }}
+            />
+          </NotebookPaper>
+        </div>
 
         <div>
           <p className="mb-2 text-sm font-medium text-cocoa-700">Color</p>
