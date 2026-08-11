@@ -61,8 +61,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center  px-4 py-10 bg-gradient-to-r from-rose-400 to-orange-300">
-      <div className="relative flex h-[90vh] w-[72vw] max-w-[1600px] overflow-hidden rounded-[2rem] bg-white shadow-2xl">
+    <div className="flex min-h-screen items-center justify-center px-4 py-10 bg-gradient-to-r from-rose-400 to-orange-300">
+      <div className="relative flex w-[72vw] max-w-[1600px] overflow-hidden rounded-[2rem] bg-white shadow-2xl sm-h-[80vh] md:h-[85vh] lg:h-[90vh]" >
 
         {/* Left illustration panel */}
         <div className="hidden md:flex  flex-col justify-between bg-rose-100 p-8">
@@ -78,7 +78,7 @@ export default function LoginPage() {
 
         {/* Right form panel */}
         <div className="w-full md:w-1/2 p-8 sm:p-10 flex flex-col justify-center">
-          <h1 className="mb-6 text-3xl font-bold text-neutral-900">Login</h1>
+          <h1 className="mb-10 text-3xl font-bold text-neutral-900">Login</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
@@ -162,7 +162,8 @@ export default function LoginPage() {
           </div>
 
           <p className="mt-6 text-center text-sm text-neutral-500">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{' '} 
+            <br />
             <a href="#" className="font-medium text-rose-500 hover:underline">
               Sign Up here
             </a>

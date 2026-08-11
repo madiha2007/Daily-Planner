@@ -56,10 +56,10 @@ export default function JournalPage() {
 
   return (
     <div className="min-h-screen bg-cream-50">
-      <Sidebar />
-      <div className="py-6 pl-24 pr-4 sm:py-8 sm:pl-28 sm:pr-6 md:pl-32 md:pr-10">
-        <div className="w-full">
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <Sidebar />
+  <div className="px-4 pb-6 pt-16 sm:px-6 sm:pb-8 md:pl-[6.5rem] md:pr-10 md:pt-8">
+    <div className="w-full">
+          <div className="mb-6 flex flex-col gap-3 lg:mt-0 mt-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Link
                 href="/dashboard"
