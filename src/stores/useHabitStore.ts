@@ -22,17 +22,27 @@ export const useHabitStore = create<HabitState>()(
       loading: false,
       error: null,
 
-      fetchAll: async () => {
-        if (get().habits.length > 0) return;
-        set({ loading: true, error: null });
-        try {
-          const habits = await fetchHabits();
-          set({ habits, loading: false });
-        } catch (err) {
-          set({ error: (err as Error).message, loading: false });
-        }
-      },
+      // fetchAll: async () => {
+      //   if (get().habits.length > 0) return;
+      //   set({ loading: true, error: null });
+      //   try {
+      //     const habits = await fetchHabits();
+      //     set({ habits, loading: false });
+      //   } catch (err) {
+      //     set({ error: (err as Error).message, loading: false });
+      //   }
+      // },
 
+      fetchAll: async () => {
+  if (get().habits.length > 0) return;
+  set({ loading: true, error: null });
+  try {
+    // No more mock seeding — starts empty, user adds real tasks.
+    set({ habits: [], loading: false });
+  } catch (err) {
+    set({ error: (err as Error).message, loading: false });
+  }
+},
       addHabit: async (input) => {
         const habit = await createHabit(input);
         set({ habits: [...get().habits, habit] });

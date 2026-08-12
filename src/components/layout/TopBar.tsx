@@ -1,8 +1,6 @@
 'use client';
 
-import { Search, Bell } from 'lucide-react';
-
-const USER_NAME = 'Madiha';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -15,7 +13,7 @@ export default function TopBar() {
   return (
     <header className="flex items-center justify-between px-2 py-2">
       <div>
-        <h1 className="font-script text-7xl text-peach-600">Hi, {USER_NAME}</h1>
+        <h1 className="font-script text-7xl text-peach-600">Hi, {useAuthStore((s) => s.user?.displayName)}</h1>
         <p className="text-sm text-cocoa-400">{getGreeting()} — here&apos;s your day</p>
       </div>
 

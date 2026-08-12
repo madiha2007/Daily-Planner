@@ -11,9 +11,11 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { signUpWithEmail } from '@/lib/firebase/auth';
 import { getAuthErrorMessage } from '@/lib/firebase/authErrors';
+import { createUserProfile } from '@/lib/firebase/profile';
 
 const schema = z
   .object({
+    name: z.string().min(1, 'Name is required').max(60),
     email: z.string().min(1, 'Email is required').email('Enter a valid email'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
@@ -38,16 +40,17 @@ export default function SignupPage() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = async (values: FormValues) => {
-    setAuthError(null);
-    try {
-      await signUpWithEmail(values.email, values.password);
-      router.push('/dashboard');
-    } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      setAuthError(getAuthErrorMessage(code));
-    }
-  };
+const onSubmit = async (values: FormValues) => {
+  setAuthError(null);
+  try {
+    const credential = await signUpWithEmail(values.email, values.password);
+    await createUserProfile(credential.user, values.name);
+    router.push('/dashboard');
+  } catch (err) {
+    const code = err instanceof FirebaseError ? err.code : '';
+    setAuthError(getAuthErrorMessage(code));
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10 bg-gradient-to-r from-rose-400 to-orange-300">
@@ -63,6 +66,23 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-neutral-800">Name</label>
+  <div
+    className={cn(
+      'flex items-center gap-2 rounded-xl border px-3 py-2.5',
+      errors.name ? 'border-red-400' : 'border-neutral-200 focus-within:border-neutral-400'
+    )}
+  >
+    <input
+      type="text"
+      placeholder="Your name"
+      autoComplete="name"
+      {...register('name')}
+      className="w-full bg-transparent text-sm text-neutral-800 focus:outline-none"
+    />
+  </div>
+  {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
+
             <label className="text-sm font-medium text-neutral-800">Email</label>
             <div
               className={cn(

@@ -20,17 +20,27 @@ export const useGoalStore = create<GoalState>()(
       loading: false,
       error: null,
 
-      fetchAll: async () => {
-        if (get().goals.length > 0) return;
-        set({ loading: true, error: null });
-        try {
-          const goals = await fetchGoals();
-          set({ goals, loading: false });
-        } catch (err) {
-          set({ error: (err as Error).message, loading: false });
-        }
-      },
+      // fetchAll: async () => {
+      //   if (get().goals.length > 0) return;
+      //   set({ loading: true, error: null });
+      //   try {
+      //     const goals = await fetchGoals();
+      //     set({ goals, loading: false });
+      //   } catch (err) {
+      //     set({ error: (err as Error).message, loading: false });
+      //   }
+      // },
 
+      fetchAll: async () => {
+  if (get().goals.length > 0) return;
+  set({ loading: true, error: null });
+  try {
+    // No more mock seeding — starts empty, user adds real goals.
+    set({ goals: [], loading: false });
+  } catch (err) {
+    set({ error: (err as Error).message, loading: false });
+  }
+},
       addGoal: async (input) => {
         const goal = await createGoal(input);
         set({ goals: [...get().goals, goal] });

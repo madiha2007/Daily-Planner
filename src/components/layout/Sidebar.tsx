@@ -22,6 +22,7 @@ import { useUIStore } from '@/stores/useUIStore';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { logOut } from '@/lib/firebase/auth';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const DASHBOARD_PATH = '/dashboard';
 const PENDING_SCROLL_KEY = 'pendingScrollSection';
@@ -175,6 +176,8 @@ export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const user = useAuthStore((s) => s.user);
+const initial = user?.displayName?.charAt(0).toUpperCase() ?? 'U';
 
 const handleLogout = async () => {
   await logOut();
@@ -202,9 +205,14 @@ const handleLogout = async () => {
       {/* ---------- DESKTOP SIDEBAR (always visible, md and up) ---------- */}
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-20 shrink-0 flex-col items-center justify-between bg-peach-100 py-6 md:flex">
         <div className="flex flex-col items-center gap-1">
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-soft text-peach-500">
-            <span className="font-script text-2xl">M</span>
-          </div>
+<div className="mb-4 flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white shadow-soft text-peach-500">
+  {user?.photoURL ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={user.photoURL} alt={user.displayName ?? 'Profile'} className="h-full w-full object-cover" />
+  ) : (
+    <span className="font-script text-2xl">{initial}</span>
+  )}
+</div>
           <NavLinks activeSection={activeSection} onNavigate={handleNavigate} />
         </div>
         <FooterActions onLogout={handleLogout} onProfile={handleProfile} />
@@ -265,13 +273,22 @@ const handleLogout = async () => {
               </button>
 
               <div className="flex w-full flex-col items-center gap-4">
-                <motion.div
-                  layoutId="logo-m"
-                  transition={{ type: 'spring', stiffness: 260, damping: 24 }}
-                  className="mb-2 mt-4 flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-soft text-peach-500"
-                >
-                  <span className="font-script text-2xl">M</span>
-                </motion.div>
+<motion.div
+  layoutId="logo-m"
+  transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+  className="mb-2 mt-4 flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white shadow-soft text-peach-500"
+>
+  {user?.photoURL ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={user.photoURL}
+      alt={user.displayName ?? 'Profile'}
+      className="h-full w-full object-cover"
+    />
+  ) : (
+    <span className="font-script text-2xl">{initial}</span>
+  )}
+</motion.div>
 
                 <NavLinks activeSection={activeSection} onNavigate={handleNavigate} showLabels />
               </div>

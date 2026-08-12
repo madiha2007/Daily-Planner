@@ -20,17 +20,27 @@ export const useJournalStore = create<JournalState>()(
       loading: false,
       error: null,
 
-      fetchAll: async () => {
-        if (get().entries.length > 0) return;
-        set({ loading: true, error: null });
-        try {
-          const entries = await fetchJournalEntries();
-          set({ entries, loading: false });
-        } catch (err) {
-          set({ error: (err as Error).message, loading: false });
-        }
-      },
+      // fetchAll: async () => {
+      //   if (get().entries.length > 0) return;
+      //   set({ loading: true, error: null });
+      //   try {
+      //     const entries = await fetchJournalEntries();
+      //     set({ entries, loading: false });
+      //   } catch (err) {
+      //     set({ error: (err as Error).message, loading: false });
+      //   }
+      // },
 
+      fetchAll: async () => {
+  if (get().entries.length > 0) return;
+  set({ loading: true, error: null });
+  try {
+    // No more mock seeding — starts empty, user adds real tasks.
+    set({ entries: [], loading: false });
+  } catch (err) {
+    set({ error: (err as Error).message, loading: false });
+  }
+},
       addEntry: async (input) => {
         const entry = await createJournalEntry(input);
         set({ entries: [entry, ...get().entries] });

@@ -21,16 +21,27 @@ export const useTaskStore = create<TaskState>()(
       loading: false,
       error: null,
 
+      // fetchAll: async () => {
+      //   if (get().tasks.length > 0) return;
+      //   set({ loading: true, error: null });
+      //   try {
+      //     const tasks = await fetchTasks();
+      //     set({ tasks, loading: false });
+      //   } catch (err) {
+      //     set({ error: (err as Error).message, loading: false });
+      //   }
+      // },
+
       fetchAll: async () => {
-        if (get().tasks.length > 0) return;
-        set({ loading: true, error: null });
-        try {
-          const tasks = await fetchTasks();
-          set({ tasks, loading: false });
-        } catch (err) {
-          set({ error: (err as Error).message, loading: false });
-        }
-      },
+  if (get().tasks.length > 0) return;
+  set({ loading: true, error: null });
+  try {
+    // No more mock seeding — starts empty, user adds real tasks.
+    set({ tasks: [], loading: false });
+  } catch (err) {
+    set({ error: (err as Error).message, loading: false });
+  }
+},
 
       addTask: async (input) => {
         const task = await createTask(input);
