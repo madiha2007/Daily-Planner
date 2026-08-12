@@ -1,16 +1,21 @@
 'use client';
 
-import { useState, } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Eye, EyeOff, X, Facebook } from 'lucide-react';
+import { FirebaseError } from 'firebase/app';
+import { Mail, Eye, EyeOff, Facebook, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import Link from 'next/link';
+import { loginWithEmail, loginWithGoogle, loginWithFacebook } from '@/lib/firebase/auth';
+import { getAuthErrorMessage } from '@/lib/firebase/authErrors';
+
 const schema = z.object({
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().min(1, 'Email is required').email('Enter a valid email'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -38,6 +43,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | 'apple' | null>(null);
 
   const {
     register,
@@ -50,35 +56,55 @@ export default function LoginPage() {
   const onSubmit = async (values: FormValues) => {
     setAuthError(null);
     try {
-      // Phase 2: replace with a real auth call, e.g.
-      // const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(values) });
-      // if (!res.ok) throw new Error('Invalid credentials');
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await loginWithEmail(values.email, values.password);
       router.push('/dashboard');
     } catch (err) {
-      setAuthError('Something went wrong. Please try again.');
+      const code = err instanceof FirebaseError ? err.code : '';
+      setAuthError(getAuthErrorMessage(code));
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'apple') => {
+    setAuthError(null);
+    setSocialLoading(provider);
+    try {
+      if (provider === 'google') await loginWithGoogle();
+      if (provider === 'facebook') await loginWithFacebook();
+      if (provider === 'apple') {
+        const { loginWithApple } = await import('@/lib/firebase/auth');
+        await loginWithApple();
+      }
+      router.push('/dashboard');
+    } catch (err) {
+      const code = err instanceof FirebaseError ? err.code : '';
+      // A user closing the popup isn't really an "error" worth alarming them about
+      if (code !== 'auth/popup-closed-by-user') {
+        setAuthError(getAuthErrorMessage(code));
+      }
+    } finally {
+      setSocialLoading(null);
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10 bg-gradient-to-r from-rose-400 to-orange-300">
-      <div className="relative flex w-[72vw] max-w-[1600px] overflow-hidden rounded-[2rem] bg-white shadow-2xl sm-h-[80vh] md:h-[85vh] lg:h-[90vh]" >
+      <div className="relative flex w-[72vw] max-w-[1600px] overflow-hidden rounded-[2rem] bg-white shadow-2xl sm-h-[80vh] md:h-[85vh] lg:h-[90vh]">
 
-        {/* Left illustration panel */}
-        <div className="hidden md:flex  flex-col justify-between bg-rose-100 p-8">
+        <div className="hidden md:flex flex-col justify-between bg-rose-100 p-8">
           <h1 className="text-5xl font-script text-rose-500">Daily Planner & Life Tracker</h1>
-          <Image
-            src="/login.jpg"
-            alt="Auth illustration"
-            width={500}
-            height={500}
-          />
+          <Image src="/login.jpg" alt="Auth illustration" width={500} height={500} />
           <span />
         </div>
 
-        {/* Right form panel */}
         <div className="w-full md:w-1/2 p-8 sm:p-10 flex flex-col justify-center">
           <h1 className="mb-10 text-3xl font-bold text-neutral-900">Login</h1>
+
+          {authError && (
+            <div className="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-600">
+              <AlertCircle size={16} className="mt-0.5 shrink-0" />
+              <span>{authError}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
@@ -93,6 +119,7 @@ export default function LoginPage() {
                 <input
                   type="email"
                   placeholder="you@example.com"
+                  autoComplete="email"
                   {...register('email')}
                   className="w-full bg-transparent text-sm text-neutral-800 focus:outline-none"
                 />
@@ -119,19 +146,18 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   {...register('password')}
                   className="w-full bg-transparent text-sm text-neutral-800 focus:outline-none"
                 />
               </div>
               {errors.password && <span className="text-xs text-red-500">{errors.password.message}</span>}
               <div className="text-right">
-                <a href="#" className="text-xs font-medium text-amber-600 hover:underline">
+                <Link href="/forgot-password" className="text-xs font-medium text-amber-600 hover:underline">
                   Forgot Password?
-                </a>
+                </Link>
               </div>
             </div>
-
-            {authError && <p className="text-xs text-red-500">{authError}</p>}
 
             <button
               type="submit"
@@ -150,23 +176,34 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-center gap-3">
-            <button className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 hover:bg-neutral-50">
+            <button
+              onClick={() => handleSocialLogin('google')}
+              disabled={socialLoading !== null}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 hover:bg-neutral-50 disabled:opacity-50"
+            >
               <GoogleIcon />
             </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-blue-600 hover:bg-neutral-50">
+            <button
+              onClick={() => handleSocialLogin('facebook')}
+              disabled={socialLoading !== null}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-blue-600 hover:bg-neutral-50 disabled:opacity-50"
+            >
               <Facebook size={18} fill="currentColor" />
             </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-800 hover:bg-neutral-50">
+            <button
+              onClick={() => handleSocialLogin('apple')}
+              disabled={socialLoading !== null}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
+            >
               <AppleIcon />
             </button>
           </div>
 
           <p className="mt-6 text-center text-sm text-neutral-500">
-            Don&apos;t have an account?{' '} 
-            <br />
-            <a href="#" className="font-medium text-rose-500 hover:underline">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="font-medium text-rose-500 hover:underline">
               Sign Up here
-            </a>
+            </Link>
           </p>
         </div>
       </div>

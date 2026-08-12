@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores/useUIStore';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 import { useOverlayStore } from '@/stores/useOverlayStore';
+import { logOut } from '@/lib/firebase/auth';
 
 const DASHBOARD_PATH = '/dashboard';
 const PENDING_SCROLL_KEY = 'pendingScrollSection';
@@ -175,7 +176,10 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => router.push('/login');
+const handleLogout = async () => {
+  await logOut();
+  router.push('/login');
+};
   const handleProfile = () => open('profileSettings');
 
   const handleNavigate = (id: string) => {
