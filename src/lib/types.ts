@@ -13,7 +13,6 @@ export interface Habit {
   title: string;
   targetPerWeek: number;
   completions: string[]; // array of ISO date strings when marked done
-  color: string;
   createdAt: string;
 }
 

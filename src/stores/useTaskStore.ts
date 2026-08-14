@@ -1,74 +1,74 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { Task } from '@/lib/types';
-import { fetchTasks, createTask, updateTask, deleteTask } from '@/lib/api/tasks';
+import { subscribeToTable, insertRow, updateRow, deleteRow } from '@/lib/supabase/queries';
+import { rowToTask, taskToRow } from '@/lib/supabase/mappers';
+import { useAuthStore } from '@/stores/useAuthStore';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface TaskState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
-  fetchAll: () => Promise<void>;
+  fetchAll: () => void;
+  subscribe: (uid: string) => void;
+  unsubscribe: () => void;
   addTask: (input: Omit<Task, 'id' | 'createdAt'>) => Promise<void>;
   editTask: (id: string, updates: Partial<Task>) => Promise<void>;
   toggleTask: (id: string) => Promise<void>;
   removeTask: (id: string) => Promise<void>;
+  reset: () => void;
 }
 
-export const useTaskStore = create<TaskState>()(
-  persist(
-    (set, get) => ({
-      tasks: [],
-      loading: false,
-      error: null,
+let channel: RealtimeChannel | null = null;
+let currentUid: string | null = null;
 
-      // fetchAll: async () => {
-      //   if (get().tasks.length > 0) return;
-      //   set({ loading: true, error: null });
-      //   try {
-      //     const tasks = await fetchTasks();
-      //     set({ tasks, loading: false });
-      //   } catch (err) {
-      //     set({ error: (err as Error).message, loading: false });
-      //   }
-      // },
+export const useTaskStore = create<TaskState>()((set, get) => ({
+  tasks: [],
+  loading: false,
+  error: null,
 
-      fetchAll: async () => {
-  if (get().tasks.length > 0) return;
-  set({ loading: true, error: null });
-  try {
-    // No more mock seeding — starts empty, user adds real tasks.
-    set({ tasks: [], loading: false });
-  } catch (err) {
-    set({ error: (err as Error).message, loading: false });
-  }
-},
+  fetchAll: () => {
+    const uid = useAuthStore.getState().user?.uid;
+    if (uid) get().subscribe(uid);
+  },
 
-      addTask: async (input) => {
-        const task = await createTask(input);
-        set({ tasks: [...get().tasks, task] });
-      },
+  subscribe: (uid) => {
+    if (currentUid === uid && channel) return;
+    if (channel) channel.unsubscribe();
+    currentUid = uid;
+    set({ loading: true, error: null });
+    channel = subscribeToTable<any>('tasks', uid, (rows) => {
+      set({ tasks: rows.map(rowToTask), loading: false });
+    });
+  },
 
-      editTask: async (id, updates) => {
-        set({ tasks: get().tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)) });
-        await updateTask(id, updates);
-      },
+  unsubscribe: () => {
+    if (channel) channel.unsubscribe();
+    channel = null;
+    currentUid = null;
+  },
 
-      toggleTask: async (id) => {
-        const current = get().tasks.find((t) => t.id === id);
-        if (!current) return;
-        set({ tasks: get().tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)) });
-        await updateTask(id, { done: !current.done });
-      },
+  addTask: async (input) => {
+    if (!currentUid) return;
+    await insertRow('tasks', taskToRow(currentUid, input));
+  },
 
-      removeTask: async (id) => {
-        set({ tasks: get().tasks.filter((t) => t.id !== id) });
-        await deleteTask(id);
-      },
-    }),
-    {
-      name: 'daily-planner:tasks',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ tasks: state.tasks }),
-    }
-  )
-);
+  editTask: async (id, updates) => {
+    if (!currentUid) return;
+    await updateRow('tasks', id, taskToRow(currentUid, updates));
+  },
+
+  toggleTask: async (id) => {
+    const current = get().tasks.find((t) => t.id === id);
+    if (!current) return;
+    await updateRow('tasks', id, { done: !current.done });
+  },
+
+  removeTask: async (id) => {
+    await deleteRow('tasks', id);
+  },
+
+  reset: () => {
+    set({ tasks: [], loading: false, error: null });
+  },
+}));

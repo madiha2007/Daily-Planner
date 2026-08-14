@@ -1,64 +1,67 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { JournalEntry } from '@/lib/types';
-import { fetchJournalEntries, createJournalEntry, deleteJournalEntry } from '@/lib/api/journal';
+import { subscribeToTable, insertRow, updateRow, deleteRow } from '@/lib/supabase/queries';
+import { rowToJournalEntry, journalEntryToRow } from '@/lib/supabase/mappers';
+import { useAuthStore } from '@/stores/useAuthStore';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface JournalState {
   entries: JournalEntry[];
   loading: boolean;
   error: string | null;
-  fetchAll: () => Promise<void>;
+  fetchAll: () => void;
+  subscribe: (uid: string) => void;
+  unsubscribe: () => void;
   addEntry: (input: Omit<JournalEntry, 'id' | 'createdAt'>) => Promise<void>;
   editEntry: (id: string, updates: Partial<JournalEntry>) => Promise<void>;
   removeEntry: (id: string) => Promise<void>;
+  reset: () => void;
 }
 
-export const useJournalStore = create<JournalState>()(
-  persist(
-    (set, get) => ({
-      entries: [],
-      loading: false,
-      error: null,
+let channel: RealtimeChannel | null = null;
+let currentUid: string | null = null;
 
-      // fetchAll: async () => {
-      //   if (get().entries.length > 0) return;
-      //   set({ loading: true, error: null });
-      //   try {
-      //     const entries = await fetchJournalEntries();
-      //     set({ entries, loading: false });
-      //   } catch (err) {
-      //     set({ error: (err as Error).message, loading: false });
-      //   }
-      // },
+export const useJournalStore = create<JournalState>()((set, get) => ({
+  entries: [],
+  loading: false,
+  error: null,
 
-      fetchAll: async () => {
-  if (get().entries.length > 0) return;
-  set({ loading: true, error: null });
-  try {
-    // No more mock seeding — starts empty, user adds real tasks.
-    set({ entries: [], loading: false });
-  } catch (err) {
-    set({ error: (err as Error).message, loading: false });
-  }
-},
-      addEntry: async (input) => {
-        const entry = await createJournalEntry(input);
-        set({ entries: [entry, ...get().entries] });
-      },
+  fetchAll: () => {
+    const uid = useAuthStore.getState().user?.uid;
+    if (uid) get().subscribe(uid);
+  },
 
-      editEntry: async (id, updates) => {
-        set({ entries: get().entries.map((e) => (e.id === id ? { ...e, ...updates } : e)) });
-      },
+  subscribe: (uid) => {
+    if (currentUid === uid && channel) return;
+    if (channel) channel.unsubscribe();
+    currentUid = uid;
+    set({ loading: true, error: null });
+    channel = subscribeToTable<any>('journal_entries', uid, (rows) => {
+      set({ entries: rows.map(rowToJournalEntry), loading: false });
+    });
+  },
 
-      removeEntry: async (id) => {
-        set({ entries: get().entries.filter((e) => e.id !== id) });
-        await deleteJournalEntry(id);
-      },
-    }),
-    {
-      name: 'daily-planner:journal',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ entries: state.entries }),
-    }
-  )
-);
+  unsubscribe: () => {
+    if (channel) channel.unsubscribe();
+    channel = null;
+    currentUid = null;
+  },
+
+  addEntry: async (input) => {
+    if (!currentUid) return;
+    await insertRow('journal_entries', journalEntryToRow(currentUid, input));
+  },
+
+  editEntry: async (id, updates) => {
+    if (!currentUid) return;
+    await updateRow('journal_entries', id, journalEntryToRow(currentUid, updates));
+  },
+
+  removeEntry: async (id) => {
+    await deleteRow('journal_entries', id);
+  },
+
+  reset: () => {
+    set({ entries: [], loading: false, error: null });
+  },
+}));

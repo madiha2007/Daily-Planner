@@ -1,79 +1,80 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { Habit } from '@/lib/types';
-import { fetchHabits, createHabit, updateHabit, toggleHabitToday, deleteHabit } from '@/lib/api/habits';
+import { subscribeToTable, insertRow, updateRow, deleteRow } from '@/lib/supabase/queries';
+import { rowToHabit, habitToRow } from '@/lib/supabase/mappers';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { formatDateISO } from '@/lib/utils';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface HabitState {
   habits: Habit[];
   loading: boolean;
   error: string | null;
-  fetchAll: () => Promise<void>;
+  fetchAll: () => void;
+  subscribe: (uid: string) => void;
+  unsubscribe: () => void;
   addHabit: (input: Omit<Habit, 'id' | 'createdAt' | 'completions'>) => Promise<void>;
   editHabit: (id: string, updates: Partial<Habit>) => Promise<void>;
   toggleToday: (id: string) => Promise<void>;
   removeHabit: (id: string) => Promise<void>;
+  reset: () => void;
 }
 
-export const useHabitStore = create<HabitState>()(
-  persist(
-    (set, get) => ({
-      habits: [],
-      loading: false,
-      error: null,
+let channel: RealtimeChannel | null = null;
+let currentUid: string | null = null;
 
-      // fetchAll: async () => {
-      //   if (get().habits.length > 0) return;
-      //   set({ loading: true, error: null });
-      //   try {
-      //     const habits = await fetchHabits();
-      //     set({ habits, loading: false });
-      //   } catch (err) {
-      //     set({ error: (err as Error).message, loading: false });
-      //   }
-      // },
+export const useHabitStore = create<HabitState>()((set, get) => ({
+  habits: [],
+  loading: false,
+  error: null,
 
-      fetchAll: async () => {
-  if (get().habits.length > 0) return;
-  set({ loading: true, error: null });
-  try {
-    // No more mock seeding — starts empty, user adds real tasks.
-    set({ habits: [], loading: false });
-  } catch (err) {
-    set({ error: (err as Error).message, loading: false });
-  }
-},
-      addHabit: async (input) => {
-        const habit = await createHabit(input);
-        set({ habits: [...get().habits, habit] });
-      },
+  fetchAll: () => {
+    const uid = useAuthStore.getState().user?.uid;
+    if (uid) get().subscribe(uid);
+  },
 
-      editHabit: async (id, updates) => {
-        set({ habits: get().habits.map((h) => (h.id === id ? { ...h, ...updates } : h)) });
-        await updateHabit(id, updates);
-      },
+  subscribe: (uid) => {
+    if (currentUid === uid && channel) return;
+    if (channel) channel.unsubscribe();
+    currentUid = uid;
+    set({ loading: true, error: null });
+    channel = subscribeToTable<any>('habits', uid, (rows) => {
+      set({ habits: rows.map(rowToHabit), loading: false });
+    });
+  },
 
-      toggleToday: async (id) => {
-        const habit = get().habits.find((h) => h.id === id);
-        if (!habit) return;
-        const today = formatDateISO(new Date());
-        const hasToday = habit.completions.includes(today);
-        const completions = hasToday
-          ? habit.completions.filter((d) => d !== today)
-          : [...habit.completions, today];
-        set({ habits: get().habits.map((h) => (h.id === id ? { ...h, completions } : h)) });
-        await toggleHabitToday(id);
-      },
+  unsubscribe: () => {
+    if (channel) channel.unsubscribe();
+    channel = null;
+    currentUid = null;
+  },
 
-      removeHabit: async (id) => {
-        set({ habits: get().habits.filter((h) => h.id !== id) });
-        await deleteHabit(id);
-      },
-    }),
-    {
-      name: 'daily-planner:habits',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ habits: state.habits }),
-    }
-  )
-);
+  addHabit: async (input) => {
+    if (!currentUid) return;
+    await insertRow('habits', { ...habitToRow(currentUid, input), completions: [] });
+  },
+
+  editHabit: async (id, updates) => {
+    if (!currentUid) return;
+    await updateRow('habits', id, habitToRow(currentUid, updates));
+  },
+
+  toggleToday: async (id) => {
+    const habit = get().habits.find((h) => h.id === id);
+    if (!habit) return;
+    const today = formatDateISO(new Date());
+    const hasToday = habit.completions.includes(today);
+    const completions = hasToday
+      ? habit.completions.filter((d) => d !== today)
+      : [...habit.completions, today];
+    await updateRow('habits', id, { completions });
+  },
+
+  removeHabit: async (id) => {
+    await deleteRow('habits', id);
+  },
+
+  reset: () => {
+    set({ habits: [], loading: false, error: null });
+  },
+}));
