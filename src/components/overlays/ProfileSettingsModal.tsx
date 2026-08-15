@@ -10,7 +10,7 @@ import Button from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { updateUserName } from '@/lib/firebase/profile';
+import { supabase } from '@/lib/supabase/client';
 import AvatarUploader from '@/components/ui/AvatarUploader';
 
 const schema = z.object({
@@ -35,23 +35,27 @@ export default function ProfileSettingsModal() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: user?.displayName ?? '',
-      timezone: DEFAULT_TIMEZONE,
+      name: user?.user_metadata?.name ?? '',
+      timezone: user?.user_metadata?.timezone ?? DEFAULT_TIMEZONE,
     },
   });
 
   const onSubmit = async (values: FormValues) => {
     if (!user) return;
     setSaveError(null);
-    try {
-      await updateUserName(user, values.name);
-      // Timezone isn't part of the Firebase Auth/Firestore profile schema yet —
-      // if you want it persisted, add a `timezone` field alongside `name`/`avatarUrl`
-      // in createUserProfile/updateUserName in lib/firebase/profile.ts.
-      close();
-    } catch {
-      setSaveError('Could not save changes. Please try again.');
+
+    // updateUser merges into user_metadata — existing keys like avatar_url
+    // are preserved, only name/timezone get overwritten here.
+    const { error } = await supabase.auth.updateUser({
+      data: { name: values.name, timezone: values.timezone },
+    });
+
+    if (error) {
+      setSaveError(error.message);
+      return;
     }
+
+    close();
   };
 
   return (
