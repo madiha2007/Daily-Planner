@@ -11,7 +11,7 @@ import { useOverlayStore } from '@/stores/useOverlayStore';
 
 const schema = z.object({
   title: z.string().min(1, 'Title is required').max(80),
-  targetPerWeek: z.coerce.number().min(1).max(7),
+  targetPerWeek: z.number().min(1).max(7),
 });
 
 type FormValues = z.infer<typeof schema>;
