@@ -5,13 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FirebaseError } from 'firebase/app';
 import { Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { signUpWithEmail } from '@/lib/firebase/auth';
-import { getAuthErrorMessage } from '@/lib/firebase/authErrors';
-import { createUserProfile } from '@/lib/firebase/profile';
+import { supabase } from '@/lib/supabase/client';
 
 const schema = z
   .object({
@@ -40,17 +37,34 @@ export default function SignupPage() {
     resolver: zodResolver(schema),
   });
 
-const onSubmit = async (values: FormValues) => {
-  setAuthError(null);
-  try {
-    const credential = await signUpWithEmail(values.email, values.password);
-    await createUserProfile(credential.user, values.name);
+  const onSubmit = async (values: FormValues) => {
+    setAuthError(null);
+
+    // `data` here becomes user_metadata on the auth.users row — no separate
+    // "profiles" write needed just to store the display name.
+    const { data, error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: { data: { name: values.name } },
+    });
+
+    if (error) {
+      setAuthError(error.message);
+      return;
+    }
+
+    // If your Supabase project has "Confirm email" turned on (Authentication
+    // → Providers → Email), there's no session yet at this point — the user
+    // has to click the link in their inbox first. Redirecting to /dashboard
+    // would just bounce them back to /login. Swap in a "check your email"
+    // screen if you have confirmation enabled; this assumes it's off.
+    if (!data.session) {
+      setAuthError('Check your email to confirm your account before logging in.');
+      return;
+    }
+
     router.push('/dashboard');
-  } catch (err) {
-    const code = err instanceof FirebaseError ? err.code : '';
-    setAuthError(getAuthErrorMessage(code));
-  }
-};
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10 bg-gradient-to-r from-rose-400 to-orange-300">
@@ -67,21 +81,21 @@ const onSubmit = async (values: FormValues) => {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-neutral-800">Name</label>
-  <div
-    className={cn(
-      'flex items-center gap-2 rounded-xl border px-3 py-2.5',
-      errors.name ? 'border-red-400' : 'border-neutral-200 focus-within:border-neutral-400'
-    )}
-  >
-    <input
-      type="text"
-      placeholder="Your name"
-      autoComplete="name"
-      {...register('name')}
-      className="w-full bg-transparent text-sm text-neutral-800 focus:outline-none"
-    />
-  </div>
-  {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
+            <div
+              className={cn(
+                'flex items-center gap-2 rounded-xl border px-3 py-2.5',
+                errors.name ? 'border-red-400' : 'border-neutral-200 focus-within:border-neutral-400'
+              )}
+            >
+              <input
+                type="text"
+                placeholder="Your name"
+                autoComplete="name"
+                {...register('name')}
+                className="w-full bg-transparent text-sm text-neutral-800 focus:outline-none"
+              />
+            </div>
+            {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
 
             <label className="text-sm font-medium text-neutral-800">Email</label>
             <div

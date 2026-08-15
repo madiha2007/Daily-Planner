@@ -34,7 +34,7 @@ export function subscribeToTable<T>(
       event: '*',
       schema: 'public',
       table,
-      filter: `user_id=eq.${uid}`,
+      // filter: `user_id=eq.${uid}`,
     },
     (payload) => {
       console.log("Realtime payload:", payload);

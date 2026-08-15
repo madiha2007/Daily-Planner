@@ -5,13 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FirebaseError } from 'firebase/app';
-import { Mail, Eye, EyeOff, Facebook, AlertCircle } from 'lucide-react';
+import { Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { loginWithEmail, loginWithGoogle, loginWithFacebook } from '@/lib/firebase/auth';
-import { getAuthErrorMessage } from '@/lib/firebase/authErrors';
+import { supabase } from '@/lib/supabase/client';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
@@ -31,19 +29,11 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M16.4 1c.1 1.1-.3 2.2-1 3-.7.8-1.9 1.5-3 1.4-.1-1.1.4-2.2 1-2.9.8-.9 2-1.5 3-1.5zM20 17.2c-.5 1.2-.8 1.8-1.5 2.8-1 1.5-2.4 3.3-4.1 3.3-1.5 0-1.9-1-4-1s-2.5 1-4 1c-1.7 0-3-1.6-4-3.1C.3 17.4-.5 13 1.1 10c.9-1.7 2.5-2.8 4.2-2.8 1.5 0 2.5 1 3.9 1 1.4 0 2.2-1 3.9-1 1.4 0 2.9.8 3.9 2-3.4 1.9-2.9 6.7 1 8z" />
-    </svg>
-  );
-}
-
 export default function LoginPage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | 'apple' | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const {
     register,
@@ -55,34 +45,29 @@ export default function LoginPage() {
 
   const onSubmit = async (values: FormValues) => {
     setAuthError(null);
-    try {
-      await loginWithEmail(values.email, values.password);
-      router.push('/dashboard');
-    } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      setAuthError(getAuthErrorMessage(code));
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+    if (error) {
+      setAuthError(error.message);
+      return;
     }
+    router.push('/dashboard');
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'apple') => {
+  const handleGoogleLogin = async () => {
     setAuthError(null);
-    setSocialLoading(provider);
-    try {
-      if (provider === 'google') await loginWithGoogle();
-      if (provider === 'facebook') await loginWithFacebook();
-      if (provider === 'apple') {
-        const { loginWithApple } = await import('@/lib/firebase/auth');
-        await loginWithApple();
-      }
-      router.push('/dashboard');
-    } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      // A user closing the popup isn't really an "error" worth alarming them about
-      if (code !== 'auth/popup-closed-by-user') {
-        setAuthError(getAuthErrorMessage(code));
-      }
-    } finally {
-      setSocialLoading(null);
+    setGoogleLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    // On success the browser navigates away to Google immediately, so we
+    // only ever reach this line if something went wrong before the redirect.
+    if (error) {
+      setAuthError(error.message);
+      setGoogleLoading(false);
     }
   };
 
@@ -175,27 +160,13 @@ export default function LoginPage() {
             <div className="h-px flex-1 bg-neutral-200" />
           </div>
 
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center">
             <button
-              onClick={() => handleSocialLogin('google')}
-              disabled={socialLoading !== null}
+              onClick={handleGoogleLogin}
+              disabled={googleLoading}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 hover:bg-neutral-50 disabled:opacity-50"
             >
               <GoogleIcon />
-            </button>
-            <button
-              onClick={() => handleSocialLogin('facebook')}
-              disabled={socialLoading !== null}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-blue-600 hover:bg-neutral-50 disabled:opacity-50"
-            >
-              <Facebook size={18} fill="currentColor" />
-            </button>
-            <button
-              onClick={() => handleSocialLogin('apple')}
-              disabled={socialLoading !== null}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
-            >
-              <AppleIcon />
             </button>
           </div>
 

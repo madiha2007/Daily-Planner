@@ -4,12 +4,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FirebaseError } from 'firebase/app';
 import { Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { resetPassword } from '@/lib/firebase/auth';
-import { getAuthErrorMessage } from '@/lib/firebase/authErrors';
+import { supabase } from '@/lib/supabase/client';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
@@ -31,17 +29,16 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (values: FormValues) => {
     setAuthError(null);
-    try {
-      await resetPassword(values.email);
+    const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    // Don't reveal whether an account exists — always show success unless
+    // it's an actual malformed-input error.
+    if (error && error.message.toLowerCase().includes('valid')) {
+      setAuthError(error.message);
+    } else {
       setSent(true);
-    } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      // Don't reveal whether an account exists — always show success unless it's a hard error
-      if (code === 'auth/invalid-email') {
-        setAuthError(getAuthErrorMessage(code));
-      } else {
-        setSent(true);
-      }
     }
   };
 
