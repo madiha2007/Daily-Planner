@@ -29,7 +29,7 @@ export const useHabitStore = create<HabitState>()((set, get) => ({
   error: null,
 
   fetchAll: () => {
-    const uid = useAuthStore.getState().user?.uid;
+    const uid = useAuthStore.getState().user?.id;
     if (uid) get().subscribe(uid);
   },
 
