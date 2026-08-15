@@ -43,7 +43,7 @@ export default function AddHabitModal() {
           type="number"
           min={1}
           max={7}
-          {...register('targetPerWeek')}
+          {...register('targetPerWeek', { valueAsNumber: true })}
           error={errors.targetPerWeek?.message}
         />
         <div className="mt-2 flex justify-end gap-2">
